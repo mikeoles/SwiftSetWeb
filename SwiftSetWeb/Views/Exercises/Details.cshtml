@@ -1,0 +1,20 @@
+﻿@model SwiftSetWeb.Models.Exercises
+
+@{
+    ViewData["Title"] = Model.Name;
+    string embedCode = ViewBag.embedCode;
+    string embedTimeSeconds = ViewBag.embedTimeSeconds;
+
+}
+
+<h2>@Html.DisplayFor(model => model.Name)</h2>
+
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+        <dd>
+            <iframe width="560" height="315" src="//www.youtube.com/embed/@embedCode?start=@embedTimeSeconds" frameborder="0" allowfullscreen></iframe>
+        </dd>
+    </dl>
+</div>
+

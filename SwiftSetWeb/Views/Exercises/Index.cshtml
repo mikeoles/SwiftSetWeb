@@ -1,0 +1,19 @@
+﻿@model IEnumerable<SwiftSetWeb.Models.Exercises>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>All Exercises</h2>
+
+<table class="table">
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>       
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
