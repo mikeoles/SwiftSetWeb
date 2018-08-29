@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SwiftSetWeb.Models;
+
 
 namespace SwiftSetWeb.Controllers
 {
@@ -15,6 +15,7 @@ namespace SwiftSetWeb.Controllers
         private readonly SwiftSetContext _context;
         private static readonly String fullUrl = "youtube.com/watch?v=";
         private static readonly String shortUrl = "youtu.be/";
+        private static List<SortingCategory> currentSortingCategories = new List<SortingCategory>();
 
         public ExercisesController(SwiftSetContext context)
         {
@@ -24,7 +25,27 @@ namespace SwiftSetWeb.Controllers
         // GET: Exercises
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Exercises.ToListAsync());
+            IQueryable<Exercises> sortedExercises = _context.Exercises;
+            foreach(SortingCategory sc in currentSortingCategories)
+            {
+                sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
+            }
+            return View(await sortedExercises.ToListAsync());
+        }
+
+        public void AddSort(int? categoryId)
+        {
+            SortingCategory sortingCategory = _context.SortingCategory.FirstOrDefault(sc => sc.Id == categoryId);
+            if (sortingCategory == null)
+            {
+                return;
+            }
+            currentSortingCategories.Add(sortingCategory);
+        }
+
+        public void ClearSort()
+        {
+            currentSortingCategories.Clear();
         }
 
         // GET: Exercises/Details/5
@@ -35,7 +56,7 @@ namespace SwiftSetWeb.Controllers
                 return NotFound();
             }
 
-            var exercises = await _context.Exercises
+            Exercises exercises = await _context.Exercises
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (exercises == null)
             {

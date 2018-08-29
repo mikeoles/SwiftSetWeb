@@ -10,9 +10,16 @@ namespace SwiftSetWeb.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly SwiftSetContext _context;
+
+        public HomeController(SwiftSetContext context)
+        {
+            _context = context;
+        }
+
         public IActionResult Index()
         {
-            return View();
+            return View(_context.SortingCategory);
         }
 
         public IActionResult About()

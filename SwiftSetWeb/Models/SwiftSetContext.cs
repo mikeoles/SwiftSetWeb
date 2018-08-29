@@ -7,10 +7,7 @@ namespace SwiftSetWeb.Models
     public partial class SwiftSetContext : DbContext
     {
         public virtual DbSet<Exercises> Exercises { get; set; }
-
-        public SwiftSetContext(DbContextOptions<SwiftSetContext> options)
-    : base(options)
-        { }
+        public virtual DbSet<SortingCategory> SortingCategory { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -20,6 +17,9 @@ namespace SwiftSetWeb.Models
                 optionsBuilder.UseSqlServer(@"Data Source =.; Initial Catalog = SwiftSet; Persist Security Info = True; User ID = SwiftSetUser; Password = sspassword!; MultipleActiveResultSets = True; Application Name = EntityFramework");
             }
         }
+
+        public SwiftSetContext(DbContextOptions<SwiftSetContext> options): base(options)
+        { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,6 +62,19 @@ namespace SwiftSetWeb.Models
                 entity.Property(e => e.Unilateral).HasDefaultValueSql("((-1))");
 
                 entity.Property(e => e.Url).HasColumnType("text");
+            });
+
+            modelBuilder.Entity<SortingCategory>(entity =>
+            {
+                entity.ToTable("sortingCategory");
+
+                entity.Property(e => e.Id).HasColumnName("_id");
+
+                entity.Property(e => e.ExerciseColumnName).HasMaxLength(50);
+
+                entity.Property(e => e.Name).HasColumnType("nchar(50)");
+
+                entity.Property(e => e.SortBy).HasMaxLength(50);
             });
         }
     }
