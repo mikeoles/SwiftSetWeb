@@ -26,6 +26,7 @@ namespace SwiftSetWeb.Controllers
         public async Task<IActionResult> Index()
         {
             IQueryable<Exercises> sortedExercises = _context.Exercises;
+            //Narrow down the list of exercises to display based on what the user has selected
             foreach(SortingCategory sc in currentSortingCategories)
             {
                 sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
@@ -33,8 +34,13 @@ namespace SwiftSetWeb.Controllers
             return View(await sortedExercises.ToListAsync());
         }
 
+        //Adds a category to sort by when viewing the list of exercises
         public void AddSort(int? categoryId)
         {
+            SortingCategory cat = _context.SortingCategory.Include(t => t.SortingGroup).FirstOrDefault();
+            SortingGroup group = _context.SortingGroups.Include(t => t.Categories).FirstOrDefault();
+
+
             SortingCategory sortingCategory = _context.SortingCategory.FirstOrDefault(sc => sc.Id == categoryId);
             if (sortingCategory == null)
             {
@@ -62,8 +68,9 @@ namespace SwiftSetWeb.Controllers
             {
                 return NotFound();
             }
-            YoutubeData videoData = parseYoutubeUrl(exercises.Url);
 
+            //Get the embed code and start time for the youtube video of the selected exercise
+            YoutubeData videoData = parseYoutubeUrl(exercises.Url);
             ViewBag.embedCode = videoData.videoCode;
             ViewBag.embedTimeSeconds = (videoData.startTimeMillis/1000).ToString();
 

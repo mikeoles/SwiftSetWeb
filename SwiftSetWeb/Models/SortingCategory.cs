@@ -9,5 +9,7 @@ namespace SwiftSetWeb.Models
         public string SortBy { get; set; }
         public string ExerciseColumnName { get; set; }
         public string Name { get; set; }
-    }
+        public int SortingGroupId { get; set; }
+        public SortingGroup SortingGroup { get; set; }
+  }
 }

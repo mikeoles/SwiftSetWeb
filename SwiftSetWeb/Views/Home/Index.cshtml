@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SwiftSetWeb.Models.SortingCategory>
+﻿@model IEnumerable<SwiftSetWeb.Models.SortingGroup>
 
 @{
     ViewData["Title"] = "Home Page";
@@ -8,31 +8,36 @@
 <!-- Scrollbar Custom CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
-<div class="wrapper">
-    <!-- Page Content -->
-    <div id="content">
-        <a asp-area="" asp-controller="Exercises" asp-action="Index">Exercises</a>
-        <a id="ClearSortButton">Clear Sorting</a>
-        <table class="table">
-            <tbody>
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            <a class="SortingButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-</div>
+<button class="btn btn-info" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises</button>
+<button class="btn btn-info" id="ClearSortButton">Clear Sorting</button>
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr id="@item.Id-group">
+                <td>
+                    <button class="btn btn-info SortingButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
+                </td>
+            </tr>
+            <tr hidden id="@item.Id-categories">
+                <td>
+                    @foreach (var category in item.Categories)
+                    {
+                        <button class="btn btn-info">@Html.DisplayFor(modelItem => category.Name)</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @section Scripts {
 
     <script type="text/javascript">
         $(document).ready(function () {
             $(".SortingButton").on("click", function () {
+                $("#" + this.id + "-categories").show();
+                $("#" + this.id + "-group").hide();
                 var path = '@Url.Action("AddSort","Exercises")';
                 $.ajax({
                     type: "POST",

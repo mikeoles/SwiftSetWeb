@@ -8,6 +8,7 @@ namespace SwiftSetWeb.Models
     {
         public virtual DbSet<Exercises> Exercises { get; set; }
         public virtual DbSet<SortingCategory> SortingCategory { get; set; }
+        public virtual DbSet<SortingGroup> SortingGroups { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
