@@ -20,7 +20,9 @@ namespace SwiftSetWeb.Controllers
 
         public IActionResult Index()
         {
-            return View(_context.SortingGroups.Include(sg => sg.Categories));
+            return View(_context.SortingGroups.
+                Include(sg => sg.Categories)
+                .Where(sg => sg.IsOriginal == true));
         }
 
         public IActionResult About()

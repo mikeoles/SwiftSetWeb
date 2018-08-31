@@ -29,7 +29,7 @@ namespace SwiftSetWeb.Controllers
             //Narrow down the list of exercises to display based on what the user has selected
             foreach(SortingCategory sc in currentSortingCategories)
             {
-                sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
+                sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
             }
             return View(await sortedExercises.ToListAsync());
         }

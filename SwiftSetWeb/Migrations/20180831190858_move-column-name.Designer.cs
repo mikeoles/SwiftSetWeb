@@ -11,9 +11,10 @@ using System;
 namespace SwiftSetWeb.Migrations
 {
     [DbContext(typeof(SwiftSetContext))]
-    partial class SwiftSetContextModelSnapshot : ModelSnapshot
+    [Migration("20180831190858_move-column-name")]
+    partial class movecolumnname
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,10 +108,6 @@ namespace SwiftSetWeb.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("ExerciseColumnName");
-
-                    b.Property<bool>("IsMultiChoice");
-
-                    b.Property<bool>("IsOriginal");
 
                     b.Property<string>("Name");
 

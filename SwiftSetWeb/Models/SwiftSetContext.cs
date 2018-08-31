@@ -71,8 +71,6 @@ namespace SwiftSetWeb.Models
 
                 entity.Property(e => e.Id).HasColumnName("_id");
 
-                entity.Property(e => e.ExerciseColumnName).HasMaxLength(50);
-
                 entity.Property(e => e.Name).HasColumnType("nchar(50)");
 
                 entity.Property(e => e.SortBy).HasMaxLength(50);
