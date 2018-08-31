@@ -16,14 +16,15 @@
         {
             <tr id="@item.Id-group">
                 <td>
-                    <button class="btn btn-info SortingButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
+                    <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                 </td>
             </tr>
             <tr hidden id="@item.Id-categories">
                 <td>
+                    <button class="btn btn-info BackToGroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                     @foreach (var category in item.Categories)
                     {
-                        <button class="btn btn-info">@Html.DisplayFor(modelItem => category.Name)</button>
+                        <button class="btn btn-info AddCategory" id="@category.Id">@Html.DisplayFor(modelItem => category.Name)</button>
                     }
                 </td>
             </tr>
@@ -35,29 +36,32 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            $(".SortingButton").on("click", function () {
-                $("#" + this.id + "-categories").show();
-                $("#" + this.id + "-group").hide();
-                var path = '@Url.Action("AddSort","Exercises")';
-                $.ajax({
-                    type: "POST",
-                    url: path,
-                    data: { categoryId: this.id },
-                    success: function (modal, status) {
-
-                    }
+            $(".GroupButton").on("click", function () {
+                $("#" + this.id + "-categories").toggle();
+                $("#" + this.id + "-group").toggle();
                 });
             });
+
             $("#ClearSortButton").on("click", function () {
                 var path = '@Url.Action("ClearSort","Exercises")';
                 $.ajax({
                     type: "POST",
                     url: path,
-                    success: function (modal, status) {
-
-                    }
                 });
             });
-        });
+
+            $(".BackToGroupButton").on("click", function () {
+                $("#" + this.id + "-categories").toggle();
+                $("#" + this.id + "-group").toggle();
+            });
+
+            $(".AddCategory").on("click", function () {
+                var path = '@Url.Action("AddSort","Exercises")';
+                $.ajax({
+                    type: "POST",
+                    url: path,
+                    data: { categoryId: this.id },
+                });
+            });
     </script>
 }

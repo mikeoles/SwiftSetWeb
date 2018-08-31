@@ -37,10 +37,6 @@ namespace SwiftSetWeb.Controllers
         //Adds a category to sort by when viewing the list of exercises
         public void AddSort(int? categoryId)
         {
-            SortingCategory cat = _context.SortingCategory.Include(t => t.SortingGroup).FirstOrDefault();
-            SortingGroup group = _context.SortingGroups.Include(t => t.Categories).FirstOrDefault();
-
-
             SortingCategory sortingCategory = _context.SortingCategory.FirstOrDefault(sc => sc.Id == categoryId);
             if (sortingCategory == null)
             {
