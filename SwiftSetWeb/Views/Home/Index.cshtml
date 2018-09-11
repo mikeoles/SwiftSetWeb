@@ -10,6 +10,7 @@
 
 <button class="btn btn-info" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises</button>
 <button class="btn btn-info" id="ClearSortButton">Clear Sorting</button>
+<ul id="ChosenCategories"></ul>
 <table class="table">
     <tbody>
         @foreach (var item in Model)
@@ -24,7 +25,7 @@
                     <button class="btn btn-info BackToGroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                     @foreach (var category in item.Categories)
                     {
-                        <button class="btn btn-info AddCategory" id="@category.Id">@Html.DisplayFor(modelItem => category.Name)</button>
+                        <button onclick="AddCategory(this,@category.Id)" class="btn btn-info AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
                     }
                 </td>
             </tr>
@@ -55,13 +56,18 @@
                 $("#" + this.id + "-group").toggle();
             });
 
-            $(".AddCategory").on("click", function () {
-                var path = '@Url.Action("AddSort","Exercises")';
-                $.ajax({
-                    type: "POST",
-                    url: path,
-                    data: { categoryId: this.id },
-                });
+        function AddCategory(e,id) {
+            $(e).closest('tr').hide();
+            var path = '@Url.Action("AddSort","Exercises")';
+            $("#ChosenCategories").append('<li>' + e.id + '</li>');
+            $.ajax({
+                type: "POST",
+                url: path,
+                data: { categoryId: id },
+                success: function (data) {
+
+                },
             });
+        }
     </script>
 }
