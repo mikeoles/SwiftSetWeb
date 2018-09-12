@@ -20,7 +20,9 @@ namespace SwiftSetWeb.Controllers
 
         public IActionResult Index()
         {
-            ExercisesController.ClearSort();
+            ExercisesController.Clear();
+            ViewBag.NumExercises = _context.Exercises.Count();
+
             return View(_context.SortingGroups
                 .Include(sg => sg.Categories)
                 .Where(sg => sg.IsOriginal == true));

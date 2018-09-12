@@ -25,27 +25,48 @@ namespace SwiftSetWeb.Controllers
         // GET: Exercises
         public async Task<IActionResult> Index()
         {
+            return View(await RunSearch().ToListAsync());
+        }
+
+        //Search for exercises using all the current sorting categories
+        private IQueryable<Exercises> RunSearch()
+        {
             IQueryable<Exercises> sortedExercises = _context.Exercises;
             //Narrow down the list of exercises to display based on what the user has selected
-            foreach(SortingCategory sc in currentSortingCategories)
+            foreach (SortingCategory sc in currentSortingCategories)
             {
-                sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
+                if(sc.Name == "Push" || sc.Name == "Pull" || sc.Name == "Legs")
+                {
+                    
+                }
+                else
+                {
+                    sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null) != null);
+                    sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
+                }
             }
-            return View(await sortedExercises.ToListAsync());
+            return sortedExercises;
         }
 
-        //Adds a category to sort by when viewing the list of exercises
-        public void AddSort(int? categoryId)
+        //Adds a category to sort by when viewing the list of exercises and return the count of how many exercises are remaining
+        [HttpGet]
+        public ActionResult AddSort(int? categoryId)
         {
             SortingCategory sortingCategory = _context.SortingCategory.Include(sc => sc.SortingGroup).FirstOrDefault(sc => sc.Id == categoryId);
-            if (sortingCategory == null)
+            if (sortingCategory != null)
             {
-                return;
+                currentSortingCategories.Add(sortingCategory);
             }
-            currentSortingCategories.Add(sortingCategory);
+            return new JsonResult(RunSearch().Count());
         }
 
-        public static void ClearSort()
+        public static void Clear()
+        {
+            currentSortingCategories.Clear();
+        }
+
+        [HttpDelete]
+        public void ClearSort()
         {
             currentSortingCategories.Clear();
         }

@@ -8,14 +8,14 @@
 <!-- Scrollbar Custom CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
-<button class="btn btn-info" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises</button>
+<button class="btn btn-info" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
 <button class="btn btn-info" id="ClearSortButton">Clear Sorting</button>
 <ul id="ChosenCategories"></ul>
 <table class="table">
     <tbody>
         @foreach (var item in Model)
         {
-            <tr id="@item.Id-group">
+            <tr id="@item.Id-group" class="GroupRows">
                 <td>
                     <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                 </td>
@@ -40,34 +40,37 @@
             $(".GroupButton").on("click", function () {
                 $("#" + this.id + "-categories").toggle();
                 $("#" + this.id + "-group").toggle();
-                });
-            });
+             });
 
             $("#ClearSortButton").on("click", function () {
+                $("#ChosenCategories").empty();
+                $(".GroupRows").show();
                 var path = '@Url.Action("ClearSort","Exercises")';
                 $.ajax({
-                    type: "POST",
+                    type: "DELETE",
                     url: path,
                 });
+                $("#ExercisesButton").text('Exercises (' +@ViewBag.NumExercises+')');
             });
 
             $(".BackToGroupButton").on("click", function () {
                 $("#" + this.id + "-categories").toggle();
                 $("#" + this.id + "-group").toggle();
             });
+        });
 
         function AddCategory(e,id) {
             $(e).closest('tr').hide();
             var path = '@Url.Action("AddSort","Exercises")';
             $("#ChosenCategories").append('<li>' + e.id + '</li>');
             $.ajax({
-                type: "POST",
+                type: "GET",
                 url: path,
                 data: { categoryId: id },
-                success: function (data) {
-
+                success: function (response) {
+                    $("#ExercisesButton").text('Exercises ('+response+')');
                 },
             });
-        }
+        }    
     </script>
 }
