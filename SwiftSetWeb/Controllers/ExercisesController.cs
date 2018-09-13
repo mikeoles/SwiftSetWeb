@@ -35,17 +35,43 @@ namespace SwiftSetWeb.Controllers
             //Narrow down the list of exercises to display based on what the user has selected
             foreach (SortingCategory sc in currentSortingCategories)
             {
-                if(sc.Name == "Push" || sc.Name == "Pull" || sc.Name == "Legs")
+                if(sc.Name.Contains("Pull")|| sc.Name.Contains("Push")|| sc.Name.Contains("Legs"))
                 {
-                    
+                    sortedExercises = PushPullLegsSearch(sc.Name,sc.SortingGroup.ExerciseColumnName, sortedExercises); 
                 }
                 else
                 {
+                    //Uses reflection to get the column based on ExerciseColumnname and then compare that value to the sortby string
                     sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null) != null);
                     sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
                 }
             }
             return sortedExercises;
+        }
+
+        //Search for all the exercises that are push, pull, or legs movements
+        private IQueryable<Exercises> PushPullLegsSearch(string name,string columnName, IQueryable<Exercises> sortedExercises)
+        {
+            List<string> muscles = new List<string>();
+            List<string> pull = new List<string>(new string[] { "Lats", "Traps", "Biceps", "Rear Delts" });
+            List<string> push = new List<string>(new string[] { "Chest", "Triceps", "Shoulders" });
+            List<string> legs = new List<string>(new string[] { "Quads", "Hamstrings", "Calf", "Glutes", "Hips" });
+
+            switch (name.Trim())
+            {
+                case "Push":
+                    muscles = push;
+                    break;
+                case "Pull":
+                    muscles = pull;
+                    break;
+                case "Legs":
+                    muscles = legs;
+                    break;
+            }
+
+            //Loop through each of the muscles in the list and check if the column contains any of those values
+            return sortedExercises.Where(e => muscles.Any(muscle => e.GetType().GetProperty(columnName).GetValue(e, null).ToString() == muscle));
         }
 
         //Adds a category to sort by when viewing the list of exercises and return the count of how many exercises are remaining
