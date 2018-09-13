@@ -78,7 +78,11 @@ namespace SwiftSetWeb.Controllers
         [HttpGet]
         public ActionResult AddSort(int? categoryId)
         {
-            SortingCategory sortingCategory = _context.SortingCategory.Include(sc => sc.SortingGroup).FirstOrDefault(sc => sc.Id == categoryId);
+            SortingCategory sortingCategory = _context.SortingCategory
+                .Include(sc => sc.NewOptions)
+                .Include(sc => sc.SortingGroup)
+                .FirstOrDefault(sc => sc.Id == categoryId);
+
             if (sortingCategory != null)
             {
                 currentSortingCategories.Add(sortingCategory);

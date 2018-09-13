@@ -15,7 +15,8 @@
     <tbody>
         @foreach (var item in Model)
         {
-            <tr id="@item.Id-group" class="GroupRows">
+            bool isOriginal = !item.IsOriginal;
+            <tr hidden="@isOriginal" id="@item.Id-group" class="GroupRows">
                 <td>
                     <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                 </td>

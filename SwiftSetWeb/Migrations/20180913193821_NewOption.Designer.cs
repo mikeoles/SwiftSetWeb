@@ -11,9 +11,10 @@ using System;
 namespace SwiftSetWeb.Migrations
 {
     [DbContext(typeof(SwiftSetContext))]
-    partial class SwiftSetContextModelSnapshot : ModelSnapshot
+    [Migration("20180913193821_NewOption")]
+    partial class NewOption
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
