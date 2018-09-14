@@ -16,7 +16,8 @@
         @foreach (var item in Model)
         {
             bool isOriginal = !item.IsOriginal;
-            <tr hidden="@isOriginal" id="@item.Id-group" class="GroupRows">
+            string isOriginalStr = item.IsOriginal ? "yes" : "no";
+            <tr hidden="@isOriginal" id="@item.Id-group" class="GroupRows" original="@isOriginalStr">
                 <td>
                     <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                 </td>
@@ -45,7 +46,8 @@
 
             $("#ClearSortButton").on("click", function () {
                 $("#ChosenCategories").empty();
-                $(".GroupRows").show();
+                $(".GroupRows ").hide();
+                $(".GroupRows[original='yes']").show();
                 var path = '@Url.Action("ClearSort","Exercises")';
                 $.ajax({
                     type: "DELETE",
@@ -69,7 +71,10 @@
                 url: path,
                 data: { categoryId: id },
                 success: function (response) {
-                    $("#ExercisesButton").text('Exercises ('+response+')');
+                    $("#ExercisesButton").text('Exercises (' + response.count + ')');
+                    for(i in response.newOptions){
+                        $("#" + response.newOptions[i] + "-group").show();
+                    }
                 },
             });
         }    

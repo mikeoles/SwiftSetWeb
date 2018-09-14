@@ -87,7 +87,13 @@ namespace SwiftSetWeb.Controllers
             {
                 currentSortingCategories.Add(sortingCategory);
             }
-            return new JsonResult(RunSearch().Count());
+            List<int> newOpts = new List<int>();
+            foreach(NewOptions option in sortingCategory.NewOptions)
+            {
+                newOpts.Add(option.SortingGroupId);
+            }
+            var genericResult = new { Count = RunSearch().Count(), NewOptions = newOpts };
+            return new JsonResult(genericResult);
         }
 
         public static void Clear()

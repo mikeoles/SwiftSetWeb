@@ -24,19 +24,9 @@ namespace SwiftSetWeb.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<NewOption>()
-                .HasKey(no => new { no.SortingCategoryId, no.SortingGroupId });
-
-            modelBuilder.Entity<NewOption>()
-                .HasOne(no => no.SortingCategory)
-                .WithMany(sc => sc.NewOptions)
-                .HasForeignKey(no => no.SortingCategoryId);
-
-            modelBuilder.Entity<NewOption>()
-                .HasOne(no => no.SortingGroup)
-                .WithMany(sg => sg.Follows)
-                .HasForeignKey(no => no.SortingGroupId);
-
+            modelBuilder.Entity<NewOptions>().HasKey(x => new { x.SortingGroupId, x.SortingCategoryId });
+            modelBuilder.Entity<NewOptions>().HasOne(x => x.SortingGroup).WithMany(x => x.NewOptions).HasForeignKey(x => x.SortingGroupId);
+            modelBuilder.Entity<NewOptions>().HasOne(x => x.SortingCategory).WithMany(x => x.NewOptions).HasForeignKey(x => x.SortingCategoryId).OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Exercises>(entity =>
             {
                 entity.ToTable("exercises");

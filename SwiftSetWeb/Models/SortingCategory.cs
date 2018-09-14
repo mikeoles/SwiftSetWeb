@@ -5,11 +5,11 @@ namespace SwiftSetWeb.Models
 {
     public partial class SortingCategory
     {
-        public int? Id { get; set; }
+        public int Id { get; set; }
         public string SortBy { get; set; }
         public string Name { get; set; }
         public int SortingGroupId { get; set; }
         public SortingGroup SortingGroup { get; set; }
-        public ICollection<NewOption> NewOptions { get; set; }
+        public ICollection<NewOptions> NewOptions { get; set; }
   }
 }

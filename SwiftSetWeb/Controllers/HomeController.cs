@@ -24,8 +24,9 @@ namespace SwiftSetWeb.Controllers
             ViewBag.NumExercises = _context.Exercises.Count();
 
             return View(_context.SortingGroups
-                .Include(sg => sg.Categories));
-        }
+                .Include(sg => sg.Categories)
+                .Include(sg => sg.NewOptions)
+                .ThenInclude(sg => sg.SortingCategory));        }
 
         public IActionResult About()
         {
