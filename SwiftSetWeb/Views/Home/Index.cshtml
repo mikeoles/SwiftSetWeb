@@ -22,12 +22,30 @@
                     <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                 </td>
             </tr>
-            <tr hidden id="@item.Id-categories">
+            <tr class="CategoryRows" hidden id="@item.Id-categories">
                 <td>
                     <button class="btn btn-info BackToGroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
-                    @foreach (var category in item.Categories)
+                    @if (@item.IsMultiChoice)
                     {
-                        <button onclick="AddCategory(this,@category.Id)" class="btn btn-info AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
+                    <form id="groupForm-@item.Id">
+                        <ul id="checkboxFilter">
+                            @foreach (var category in item.Categories)
+                            {
+                                <li>
+                                    <input type="checkbox" class="cbk" name="@category.Name" value="@category.Name" id="@category.Id" /> @category.Name
+                                </li>
+                            }
+                        </ul>
+                        <input type="button" value="Submit" onclick="AddMultiCategory('groupForm-@item.Id')" />
+                    </form>
+                    }
+                    else
+                    {
+                        @foreach (var category in item.Categories)
+                        {
+                            <button onclick="AddCategory(this,@category.Id)" class="btn btn-info AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
+                        }
+
                     }
                 </td>
             </tr>
@@ -46,7 +64,8 @@
 
             $("#ClearSortButton").on("click", function () {
                 $("#ChosenCategories").empty();
-                $(".GroupRows ").hide();
+                $(".GroupRows").hide();
+                $(".CategoryRows").hide();
                 $(".GroupRows[original='yes']").show();
                 var path = '@Url.Action("ClearSort","Exercises")';
                 $.ajax({
@@ -70,6 +89,7 @@
                 type: "GET",
                 url: path,
                 data: { categoryId: id },
+                traditional: true, // add this
                 success: function (response) {
                     $("#ExercisesButton").text('Exercises (' + response.count + ')');
                     for(i in response.newOptions){
@@ -78,5 +98,27 @@
                 },
             });
         }    
+
+        function AddMultiCategory(btnClicked) {
+            var ids = [];
+            $('#checkboxFilter li input[type=checkbox]:checked').each(function (index, val) {
+                ids.push($(val).attr("Id"));  
+            });
+            var path = '@Url.Action("AddMultiSort","Exercises")';
+            $.ajax({
+                type: "GET",
+                url: path,
+                data: JSON.stringify(ids),
+                success: function (response) {
+                    $("#ExercisesButton").text('Exercises (' + response.count + ')');
+                    for (i in response.newOptions) {
+                        $("#" + response.newOptions[i] + "-group").show();
+                    }
+                }
+            });
+
+            return false;// if it's a link to prevent post
+
+        }
     </script>
 }

@@ -96,6 +96,11 @@ namespace SwiftSetWeb.Controllers
             return new JsonResult(genericResult);
         }
 
+        [HttpGet]
+        public ActionResult AddMultiSort(int[] ids) {
+            return View(RunSearch().ToListAsync());
+        }
+
         public static void Clear()
         {
             currentSortingCategories.Clear();

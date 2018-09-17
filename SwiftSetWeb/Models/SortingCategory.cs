@@ -11,5 +11,6 @@ namespace SwiftSetWeb.Models
         public int SortingGroupId { get; set; }
         public SortingGroup SortingGroup { get; set; }
         public ICollection<NewOptions> NewOptions { get; set; }
+        public Boolean Selected { get; set; }
   }
 }
