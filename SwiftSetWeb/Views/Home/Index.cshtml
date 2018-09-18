@@ -73,6 +73,9 @@
                     url: path,
                 });
                 $("#ExercisesButton").text('Exercises (' +@ViewBag.NumExercises+')');
+                $('.cbk').each(function () {//uncheck all checkboxes
+                    this.checked = false; 
+                });
             });
 
             $(".BackToGroupButton").on("click", function () {
@@ -89,7 +92,6 @@
                 type: "GET",
                 url: path,
                 data: { categoryId: id },
-                traditional: true, // add this
                 success: function (response) {
                     $("#ExercisesButton").text('Exercises (' + response.count + ')');
                     for(i in response.newOptions){
@@ -100,25 +102,22 @@
         }    
 
         function AddMultiCategory(btnClicked) {
-            var ids = [];
+            $(".CategoryRows").hide();
+            var ids = "";
             $('#checkboxFilter li input[type=checkbox]:checked').each(function (index, val) {
-                ids.push($(val).attr("Id"));  
+                ids += $(val).attr("Id") + ",";
             });
             var path = '@Url.Action("AddMultiSort","Exercises")';
             $.ajax({
                 type: "GET",
                 url: path,
-                data: JSON.stringify(ids),
+                data: { categoryIds: ids },
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     $("#ExercisesButton").text('Exercises (' + response.count + ')');
-                    for (i in response.newOptions) {
-                        $("#" + response.newOptions[i] + "-group").show();
-                    }
                 }
             });
-
-            return false;// if it's a link to prevent post
-
         }
     </script>
 }

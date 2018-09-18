@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "01e5771f7e8b429492f0f2274214c7fcc3419588"
+    "signature": "507353e451902901dd2b1f497112bc7cc5ca7689"
   },
   "compilationOptions": {
     "defines": [
@@ -24,6 +24,7 @@
     ".NETCoreApp,Version=v2.0": {
       "SwiftSetWeb/1.0.0": {
         "dependencies": {
+          "LinqKit": "1.1.15",
           "Microsoft.AspNetCore.All": "2.0.8",
           "Microsoft.NETCore.App": "2.0.0",
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": "2.0.3"
@@ -80,6 +81,17 @@
             "assetType": "native",
             "fileVersion": "0.0.0.0"
           }
+        }
+      },
+      "LinqKit/1.1.15": {
+        "runtime": {
+          "lib/net45/LinqKit.dll": {
+            "assemblyVersion": "1.1.15.0",
+            "fileVersion": "1.1.15.0"
+          }
+        },
+        "compile": {
+          "lib/net45/LinqKit.dll": {}
         }
       },
       "Microsoft.ApplicationInsights/2.4.0": {
@@ -4822,6 +4834,13 @@
       "path": "libuv/1.10.0",
       "hashPath": "libuv.1.10.0.nupkg.sha512"
     },
+    "LinqKit/1.1.15": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-hDQCBW9PwAudRrW3IQX78vRF/qH5h2ImdmI9khiTqBd5Yb39TR1oFu+bqcDoG9wLyEmPwAF1Dh/qlwC2plR+Jg==",
+      "path": "linqkit/1.1.15",
+      "hashPath": "linqkit.1.1.15.nupkg.sha512"
+    },
     "Microsoft.ApplicationInsights/2.4.0": {
       "type": "package",
       "serviceable": true,
@@ -5861,7 +5880,7 @@
     "Microsoft.Extensions.PlatformAbstractions/1.1.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-H6ZsQzxYw/6k2DfEQRXdC+vQ6obd6Uba3uGJrnJ2vG4PRXjQZ7seB13JdCfE72abp8E6Fk3gGgDzfJiLZi5ZpQ==",
+      "sha512": "sha512-UMlN++q5qqzQ2HH+uOrKxN5fmBXMQDhrYkSaPJxhmyzfJaFPirrVr1raim/Ocq1psAZoB9+7JSAf0GDAX35wUg==",
       "path": "microsoft.extensions.platformabstractions/1.1.0",
       "hashPath": "microsoft.extensions.platformabstractions.1.1.0.nupkg.sha512"
     },

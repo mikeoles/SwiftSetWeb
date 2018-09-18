@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using LinqKit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SwiftSetWeb.Models;
@@ -16,6 +17,7 @@ namespace SwiftSetWeb.Controllers
         private static readonly String fullUrl = "youtube.com/watch?v=";
         private static readonly String shortUrl = "youtu.be/";
         private static List<SortingCategory> currentSortingCategories = new List<SortingCategory>();
+        private static List<SortingCategory> multiChoiceCategories = new List<SortingCategory>();
 
         public ExercisesController(SwiftSetContext context)
         {
@@ -46,6 +48,9 @@ namespace SwiftSetWeb.Controllers
                     sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
                 }
             }
+            sortedExercises = sortedExercises.Where(e => multiChoiceCategories
+                .Any(sc => sc.SortBy == e.Equipment.ToString() || sc.SortBy == e.Difficulty.ToString()));
+
             return sortedExercises;
         }
 
@@ -97,19 +102,34 @@ namespace SwiftSetWeb.Controllers
         }
 
         [HttpGet]
-        public ActionResult AddMultiSort(int[] ids) {
-            return View(RunSearch().ToListAsync());
+        public ActionResult AddMultiSort(string categoryIds) {
+            categoryIds = categoryIds.TrimEnd(',');
+            int[] ids = Array.ConvertAll(categoryIds.Split(','), int.Parse);
+            multiChoiceCategories = new List<SortingCategory>();
+            foreach(int id in ids)
+            {
+                SortingCategory sortingCategory = _context.SortingCategory
+                    .Include(sc => sc.NewOptions)
+                    .Include(sc => sc.SortingGroup)
+                    .FirstOrDefault(sc => sc.Id == id);
+                multiChoiceCategories.Add(sortingCategory);
+            }
+
+            var genericResult = new { Count = RunSearch().Count()};
+            return new JsonResult(genericResult);
         }
 
         public static void Clear()
         {
             currentSortingCategories.Clear();
+            multiChoiceCategories.Clear();
         }
 
         [HttpDelete]
         public void ClearSort()
         {
             currentSortingCategories.Clear();
+            multiChoiceCategories.Clear();
         }
 
         // GET: Exercises/Details/5
