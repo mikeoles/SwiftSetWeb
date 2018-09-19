@@ -4,11 +4,14 @@
     ViewData["Title"] = Model.Name;
     string embedCode = ViewBag.embedCode;
     string embedTimeSeconds = ViewBag.embedTimeSeconds;
-
+    Boolean fromRandom = ViewBag.fromRandom;
 }
 
 <h2>@Html.DisplayFor(model => model.Name)</h2>
-
+@if (@fromRandom)
+{
+    <input class="btn btn-info" type="button" value="Choose Another Random" onclick="location.href='@Url.Action("Random", "Exercises")'" />
+}
 <div>
     <hr />
     <dl class="dl-horizontal">
@@ -17,4 +20,3 @@
         </dd>
     </dl>
 </div>
-

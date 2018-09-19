@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,35 +12,39 @@ using SwiftSetWeb.Models;
 
 namespace SwiftSetWeb.Controllers
 {
-    public class ExercisesController : Controller
-    {
+    public class ExercisesController : Controller {
         private readonly SwiftSetContext _context;
         private static readonly String fullUrl = "youtube.com/watch?v=";
         private static readonly String shortUrl = "youtu.be/";
         private static List<SortingCategory> currentSortingCategories = new List<SortingCategory>();
         private static List<SortingCategory> multiChoiceCategories = new List<SortingCategory>();
 
-        public ExercisesController(SwiftSetContext context)
-        {
+        public ExercisesController(SwiftSetContext context) {
             _context = context;
         }
 
         // GET: Exercises
-        public async Task<IActionResult> Index()
-        {
-            return View(await RunSearch().ToListAsync());
+        public async Task<IActionResult> Index(String searchString) {
+
+            List<Exercises> filteredExercises = await RunSearch().ToListAsync();
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                filteredExercises = filteredExercises.Where(s => s.Name.ToLower().Contains(searchString)).ToList();
+                ViewBag.searchText = searchString;
+            }
+
+            return View(filteredExercises as List<Exercises>);
         }
 
         //Search for exercises using all the current sorting categories
-        private IQueryable<Exercises> RunSearch()
-        {
+        private IQueryable<Exercises> RunSearch() {
             IQueryable<Exercises> sortedExercises = _context.Exercises;
             //Narrow down the list of exercises to display based on what the user has selected
             foreach (SortingCategory sc in currentSortingCategories)
             {
-                if(sc.Name.Contains("Pull")|| sc.Name.Contains("Push")|| sc.Name.Contains("Legs"))
+                if (sc.Name.Contains("Pull") || sc.Name.Contains("Push") || sc.Name.Contains("Legs"))
                 {
-                    sortedExercises = PushPullLegsSearch(sc.Name,sc.SortingGroup.ExerciseColumnName, sortedExercises); 
+                    sortedExercises = PushPullLegsSearch(sc.Name, sc.SortingGroup.ExerciseColumnName, sortedExercises);
                 }
                 else
                 {
@@ -48,15 +53,17 @@ namespace SwiftSetWeb.Controllers
                     sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
                 }
             }
-            sortedExercises = sortedExercises.Where(e => multiChoiceCategories
-                .Any(sc => sc.SortBy == e.Equipment.ToString() || sc.SortBy == e.Difficulty.ToString()));
+            if (multiChoiceCategories.Count() > 0)
+            {
+                sortedExercises = sortedExercises.Where(e => multiChoiceCategories
+                    .Any(sc => sc.SortBy == e.Equipment.ToString() || sc.SortBy == e.Difficulty.ToString()));
+            }
 
             return sortedExercises;
         }
 
         //Search for all the exercises that are push, pull, or legs movements
-        private IQueryable<Exercises> PushPullLegsSearch(string name,string columnName, IQueryable<Exercises> sortedExercises)
-        {
+        private IQueryable<Exercises> PushPullLegsSearch(string name, string columnName, IQueryable<Exercises> sortedExercises) {
             List<string> muscles = new List<string>();
             List<string> pull = new List<string>(new string[] { "Lats", "Traps", "Biceps", "Rear Delts" });
             List<string> push = new List<string>(new string[] { "Chest", "Triceps", "Shoulders" });
@@ -81,8 +88,7 @@ namespace SwiftSetWeb.Controllers
 
         //Adds a category to sort by when viewing the list of exercises and return the count of how many exercises are remaining
         [HttpGet]
-        public ActionResult AddSort(int? categoryId)
-        {
+        public ActionResult AddSort(int? categoryId) {
             SortingCategory sortingCategory = _context.SortingCategory
                 .Include(sc => sc.NewOptions)
                 .Include(sc => sc.SortingGroup)
@@ -93,7 +99,7 @@ namespace SwiftSetWeb.Controllers
                 currentSortingCategories.Add(sortingCategory);
             }
             List<int> newOpts = new List<int>();
-            foreach(NewOptions option in sortingCategory.NewOptions)
+            foreach (NewOptions option in sortingCategory.NewOptions)
             {
                 newOpts.Add(option.SortingGroupId);
             }
@@ -106,7 +112,7 @@ namespace SwiftSetWeb.Controllers
             categoryIds = categoryIds.TrimEnd(',');
             int[] ids = Array.ConvertAll(categoryIds.Split(','), int.Parse);
             multiChoiceCategories = new List<SortingCategory>();
-            foreach(int id in ids)
+            foreach (int id in ids)
             {
                 SortingCategory sortingCategory = _context.SortingCategory
                     .Include(sc => sc.NewOptions)
@@ -115,26 +121,23 @@ namespace SwiftSetWeb.Controllers
                 multiChoiceCategories.Add(sortingCategory);
             }
 
-            var genericResult = new { Count = RunSearch().Count()};
+            var genericResult = new { Count = RunSearch().Count() };
             return new JsonResult(genericResult);
         }
 
-        public static void Clear()
-        {
+        public static void Clear() {
             currentSortingCategories.Clear();
             multiChoiceCategories.Clear();
         }
 
         [HttpDelete]
-        public void ClearSort()
-        {
+        public void ClearSort() {
             currentSortingCategories.Clear();
             multiChoiceCategories.Clear();
         }
 
         // GET: Exercises/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
+        public async Task<IActionResult> Details(int? id) {
             if (id == null)
             {
                 return NotFound();
@@ -150,9 +153,29 @@ namespace SwiftSetWeb.Controllers
             //Get the embed code and start time for the youtube video of the selected exercise
             YoutubeData videoData = parseYoutubeUrl(exercises.Url);
             ViewBag.embedCode = videoData.videoCode;
-            ViewBag.embedTimeSeconds = (videoData.startTimeMillis/1000).ToString();
+            ViewBag.embedTimeSeconds = (videoData.startTimeMillis / 1000).ToString();
+            ViewBag.fromRandom = false;
 
             return View(exercises);
+        }
+
+        // GET: Exercises/Details/5
+        public async Task<IActionResult> Random() {
+            List<Exercises> exercises = await _context.Exercises.ToListAsync();
+            var random = new Random();
+            int index = random.Next(exercises.Count);
+            if (exercises == null)
+            {
+                return NotFound();
+            }
+            Exercises exercise = exercises[index];
+            //Get the embed code and start time for the youtube video of the selected exercise
+            YoutubeData videoData = parseYoutubeUrl(exercise.Url);
+            ViewBag.embedCode = videoData.videoCode;
+            ViewBag.embedTimeSeconds = (videoData.startTimeMillis / 1000).ToString();
+            ViewBag.fromRandom = true;
+
+            return View("~/Views/Exercises/Details.cshtml", exercise);
         }
 
         private bool ExercisesExists(int id)

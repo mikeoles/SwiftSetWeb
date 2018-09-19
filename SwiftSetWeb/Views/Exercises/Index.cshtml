@@ -2,18 +2,51 @@
 
 @{
     ViewData["Title"] = "Index";
+    string searchText = ViewBag.searchText;
 }
 
 <h2>All Exercises</h2>
-
+<form asp-controller="Exercises" asp-action="Index">
+    <p>
+        <input id="searchBox" type="text" name="SearchString">
+    </p>
+</form>
+<input class="btn btn-info" type="button" value="Choose Random" onclick="location.href='@Url.Action("Random", "Exercises")'" />
 <table class="table">
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>       
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts {
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var typingTimer;                //timer identifier
+            var doneTypingInterval = 500;  //time in ms (2 seconds)
+
+            $("#searchBox").val(@searchText);
+
+            $('#searchBox').on("keyup",function () {
+                clearTimeout(typingTimer);
+                if ($('#searchBox').val()) {
+                    typingTimer = setTimeout(doneTyping, doneTypingInterval);
+                }
+            });
+
+            function doneTyping() {
+                window.location.href = '@Url.Action("Index", "Exercises")' + '/?searchString=' + $("#searchBox").val();
+            }
+        });
+
+    </script>
+}
+
