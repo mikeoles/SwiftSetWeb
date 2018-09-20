@@ -8,11 +8,17 @@
 <!-- Scrollbar Custom CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
-<button class="btn btn-info" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
-<button class="btn btn-info" id="ClearSortButton">Clear Sorting</button>
 <ul id="ChosenCategories" class="list-inline"></ul>
-<table class="table">
+<table id="mainTable" class="table">
     <tbody>
+        <tr>
+            <td>
+                <div class="ControlButtons">
+                    <button class="btn btn-primary" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
+                    <button hidden="hidden" class="btn btn-primary" id="ClearSortButton">Clear Sorting</button>
+                </div>
+            </td>
+        </tr>
         @foreach (var item in Model)
         {
             bool isOriginal = !item.IsOriginal;
@@ -27,21 +33,22 @@
                     <button class="btn btn-info BackToGroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                     @if (@item.IsMultiChoice)
                     {
+                        <input class="btn btn-success" type="submit" value="Submit" onclick="AddMultiCategory()" />
                         <div class="btn-group" data-toggle="buttons-checkbox">
                             @foreach (var category in item.Categories)
                             {
                                 <button type="submit" class="btn btn-primary multiChoiceButton" name="@category.Name" value="@category.Name" id="@category.Id">@category.Name</button>
                             }
                         </div>
-                        <input class="btn btn-default" type="submit" value="Submit" onclick="AddMultiCategory()" />
                     }
                     else
                     {
-                        @foreach (var category in item.Categories)
-                        {
-                            <button onclick="AddCategory(this,@category.Id)" class="btn btn-info AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
-                        }
-
+                        <div class="btn-group" data-toggle="buttons-checkbox">
+                            @foreach (var category in item.Categories)
+                            {
+                                <button onclick="AddCategory(this,@category.Id)" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
+                            }
+                        </div>
                     }
                 </td>
             </tr>
@@ -53,6 +60,9 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+
+            $('#ClearSortButton').hide();
+
             $(".GroupButton").on("click", function () {
                 $("#" + this.id + "-categories").toggle();
                 $("#" + this.id + "-group").toggle();
@@ -62,6 +72,7 @@
                 $("#ChosenCategories").empty();
                 $(".GroupRows").hide();
                 $(".CategoryRows").hide();
+                $('#ClearSortButton').hide();
                 $(".GroupRows[original='yes']").show();
                 var path = '@Url.Action("ClearSort","Exercises")';
                 $.ajax({
@@ -84,6 +95,7 @@
             $(e).closest('tr').hide();
             var path = '@Url.Action("AddSort","Exercises")';
             $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + e.id + '</li>');
+            $('#ClearSortButton').show();
             $.ajax({
                 type: "GET",
                 url: path,
@@ -106,6 +118,7 @@
                     $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + $(this).attr("name") + '</li>');
                 }
             });
+            $('#ClearSortButton').show();
             var path = '@Url.Action("AddMultiSort","Exercises")';
             $.ajax({
                 type: "GET",

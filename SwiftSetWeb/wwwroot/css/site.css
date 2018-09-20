@@ -33,3 +33,45 @@
         display: none;
     }
 }
+
+#mainTable{
+    width: 50%;
+}
+
+.multiChoiceButton {
+    width: 150px;
+    border-radius: 0px;
+}
+
+.AddCategory {
+    width: 150px;
+    border-radius: 0px;
+}
+
+.GroupButton, .BackToGroupButton{
+    width: 200px;
+}
+
+.BackToGroupButton {
+    vertical-align: middle;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.CategoryRows {
+    margin-bottom: 10px;
+}
+
+.ControlButtons button {
+    font-weight: bold;
+    width: 200px;
+}
+
+#mainTable tr td{
+    border-top: 0px;
+}
+
+.btn-group {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
