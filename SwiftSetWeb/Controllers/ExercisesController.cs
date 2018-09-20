@@ -14,9 +14,10 @@ namespace SwiftSetWeb.Controllers
 {
     public class ExercisesController : Controller {
         private readonly SwiftSetContext _context;
+        private static List<Exercises> currentExercises;
         private static readonly String fullUrl = "youtube.com/watch?v=";
         private static readonly String shortUrl = "youtu.be/";
-        private static List<SortingCategory> currentSortingCategories = new List<SortingCategory>();
+        private static SortingCategory currentSortingCategory = new SortingCategory();
         private static List<SortingCategory> multiChoiceCategories = new List<SortingCategory>();
 
         public ExercisesController(SwiftSetContext context) {
@@ -26,44 +27,32 @@ namespace SwiftSetWeb.Controllers
         // GET: Exercises
         public async Task<IActionResult> Index(String searchString) {
 
-            List<Exercises> filteredExercises = await RunSearch().ToListAsync();
+            List<Exercises> filteredExercises = GetExercises();
+
             if (!String.IsNullOrEmpty(searchString))
             {
                 filteredExercises = filteredExercises.Where(s => s.Name.ToLower().Contains(searchString)).ToList();
                 ViewBag.searchText = searchString;
             }
 
-            return View(filteredExercises as List<Exercises>);
+            return View(filteredExercises);
         }
 
-        //Search for exercises using all the current sorting categories
-        private IQueryable<Exercises> RunSearch() {
-            IQueryable<Exercises> sortedExercises = _context.Exercises;
-            //Narrow down the list of exercises to display based on what the user has selected
-            foreach (SortingCategory sc in currentSortingCategories)
+        private List<Exercises> GetExercises() {
+            List<Exercises> filteredExercises;
+            if (currentExercises != null)
             {
-                if (sc.Name.Contains("Pull") || sc.Name.Contains("Push") || sc.Name.Contains("Legs"))
-                {
-                    sortedExercises = PushPullLegsSearch(sc.Name, sc.SortingGroup.ExerciseColumnName, sortedExercises);
-                }
-                else
-                {
-                    //Uses reflection to get the column based on ExerciseColumnname and then compare that value to the sortby string
-                    sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null) != null);
-                    sortedExercises = sortedExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy);
-                }
+                filteredExercises = currentExercises;
             }
-            if (multiChoiceCategories.Count() > 0)
+            else
             {
-                sortedExercises = sortedExercises.Where(e => multiChoiceCategories
-                    .Any(sc => sc.SortBy == e.Equipment.ToString() || sc.SortBy == e.Difficulty.ToString()));
+                filteredExercises = _context.Exercises.ToList();
             }
-
-            return sortedExercises;
+            return filteredExercises;
         }
 
         //Search for all the exercises that are push, pull, or legs movements
-        private IQueryable<Exercises> PushPullLegsSearch(string name, string columnName, IQueryable<Exercises> sortedExercises) {
+        private List<Exercises> PushPullLegsSearch(string name, string columnName, List<Exercises> sortedExercises) {
             List<string> muscles = new List<string>();
             List<string> pull = new List<string>(new string[] { "Lats", "Traps", "Biceps", "Rear Delts" });
             List<string> push = new List<string>(new string[] { "Chest", "Triceps", "Shoulders" });
@@ -83,27 +72,46 @@ namespace SwiftSetWeb.Controllers
             }
 
             //Loop through each of the muscles in the list and check if the column contains any of those values
-            return sortedExercises.Where(e => muscles.Any(muscle => e.GetType().GetProperty(columnName).GetValue(e, null).ToString() == muscle));
+            return sortedExercises.Where(e => muscles.Any(muscle => e.GetType().GetProperty(columnName).GetValue(e, null).ToString() == muscle)).ToList();
         }
 
         //Adds a category to sort by when viewing the list of exercises and return the count of how many exercises are remaining
         [HttpGet]
         public ActionResult AddSort(int? categoryId) {
             SortingCategory sortingCategory = _context.SortingCategory
-                .Include(sc => sc.NewOptions)
-                .Include(sc => sc.SortingGroup)
-                .FirstOrDefault(sc => sc.Id == categoryId);
+                .Include(s => s.NewOptions)
+                .Include(s => s.SortingGroup)
+                .FirstOrDefault(s => s.Id == categoryId);
 
             if (sortingCategory != null)
             {
-                currentSortingCategories.Add(sortingCategory);
+                currentSortingCategory = sortingCategory;
             }
             List<int> newOpts = new List<int>();
             foreach (NewOptions option in sortingCategory.NewOptions)
             {
                 newOpts.Add(option.SortingGroupId);
             }
-            var genericResult = new { Count = RunSearch().Count(), NewOptions = newOpts };
+
+            List<Exercises> filteredExercises = GetExercises();
+
+            //Narrow down the list of exercises to display based on what the user has selected
+            SortingCategory sc = currentSortingCategory;
+
+            if (sc.Name.Contains("Pull") || sc.Name.Contains("Push") || sc.Name.Contains("Legs"))
+            {
+                filteredExercises = PushPullLegsSearch(sc.Name, sc.SortingGroup.ExerciseColumnName, filteredExercises);
+            }
+            else
+            {
+                //Uses reflection to get the column based on ExerciseColumnname and then compare that value to the sortby string
+                filteredExercises = filteredExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null) != null).ToList();
+                filteredExercises = filteredExercises.Where(e => e.GetType().GetProperty(sc.SortingGroup.ExerciseColumnName).GetValue(e, null).ToString() == sc.SortBy).ToList();
+            }
+            currentSortingCategory = null;
+            currentExercises = filteredExercises;
+
+            var genericResult = new { Count = filteredExercises.Count(), NewOptions = newOpts };
             return new JsonResult(genericResult);
         }
 
@@ -121,19 +129,28 @@ namespace SwiftSetWeb.Controllers
                 multiChoiceCategories.Add(sortingCategory);
             }
 
-            var genericResult = new { Count = RunSearch().Count() };
+            List<Exercises> filteredExercises = GetExercises();
+
+            if (multiChoiceCategories.Count() > 0)
+            {
+                filteredExercises = filteredExercises.Where(e => multiChoiceCategories
+                    .Any(s => s.SortBy == e.Equipment.ToString() || s.SortBy == e.Difficulty.ToString())).ToList();
+                multiChoiceCategories.Clear();
+            }
+            currentExercises = filteredExercises;
+
+            var genericResult = new { Count = filteredExercises.Count() };
             return new JsonResult(genericResult);
         }
 
         public static void Clear() {
-            currentSortingCategories.Clear();
+            currentExercises = null;
             multiChoiceCategories.Clear();
         }
 
         [HttpDelete]
         public void ClearSort() {
-            currentSortingCategories.Clear();
-            multiChoiceCategories.Clear();
+            Clear();
         }
 
         // GET: Exercises/Details/5

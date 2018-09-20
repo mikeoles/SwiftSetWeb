@@ -10,7 +10,7 @@
 
 <button class="btn btn-info" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
 <button class="btn btn-info" id="ClearSortButton">Clear Sorting</button>
-<ul id="ChosenCategories"></ul>
+<ul id="ChosenCategories" class="list-inline"></ul>
 <table class="table">
     <tbody>
         @foreach (var item in Model)
@@ -27,17 +27,13 @@
                     <button class="btn btn-info BackToGroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                     @if (@item.IsMultiChoice)
                     {
-                    <form id="groupForm-@item.Id">
-                        <ul id="checkboxFilter">
+                        <div class="btn-group" data-toggle="buttons-checkbox">
                             @foreach (var category in item.Categories)
                             {
-                                <li>
-                                    <input type="checkbox" class="cbk" name="@category.Name" value="@category.Name" id="@category.Id" /> @category.Name
-                                </li>
+                                <button type="submit" class="btn btn-primary multiChoiceButton" name="@category.Name" value="@category.Name" id="@category.Id">@category.Name</button>
                             }
-                        </ul>
-                        <input type="button" value="Submit" onclick="AddMultiCategory('groupForm-@item.Id')" />
-                    </form>
+                        </div>
+                        <input class="btn btn-default" type="submit" value="Submit" onclick="AddMultiCategory()" />
                     }
                     else
                     {
@@ -87,7 +83,7 @@
         function AddCategory(e,id) {
             $(e).closest('tr').hide();
             var path = '@Url.Action("AddSort","Exercises")';
-            $("#ChosenCategories").append('<li>' + e.id + '</li>');
+            $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + e.id + '</li>');
             $.ajax({
                 type: "GET",
                 url: path,
@@ -101,11 +97,14 @@
             });
         }    
 
-        function AddMultiCategory(btnClicked) {
+        function AddMultiCategory() {
             $(".CategoryRows").hide();
             var ids = "";
-            $('#checkboxFilter li input[type=checkbox]:checked').each(function (index, val) {
-                ids += $(val).attr("Id") + ",";
+            $(".multiChoiceButton").each(function (i, obj) {
+                if ($(this).hasClass('active')) {
+                    ids += $(this).attr("id") + ",";
+                    $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + $(this).attr("name") + '</li>');
+                }
             });
             var path = '@Url.Action("AddMultiSort","Exercises")';
             $.ajax({
