@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SwiftSetWeb.Models.SortingGroup>
+@model IEnumerable<SwiftSetWeb.Models.SortingGroup>
 
 @{
     ViewData["Title"] = "Home Page";
@@ -9,70 +9,78 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
 <ul id="ChosenCategories" class="list-inline"></ul>
-<table id="mainTable" class="table">
-    <tbody>
-        <tr>
-            <td>
-                <div class="ControlButtons">
-                    <button class="btn btn-primary" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
-                    <button hidden="hidden" class="btn btn-primary" id="ClearSortButton">Clear Sorting</button>
-                </div>
-            </td>
-        </tr>
+<div id="end">
+    <div id="Groups">
+
+        <table id="mainTable" class="table">
+            <tbody>
+                <tr>
+                    <td>
+                        <div class="ControlButtons">
+                            <button class="btn btn-primary" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
+                            <button class="btn btn-primary hidden" id="ClearSortButton">Clear Sorting</button>
+                        </div>
+                    </td>
+                </tr>
+                @foreach (var item in Model)
+                {
+                    bool isOriginal = !item.IsOriginal;
+                    string isOriginalStr = item.IsOriginal ? "yes" : "no";
+                    <tr>
+                        <td hidden="@isOriginal" class="GroupRows @item.Id-group" original="@isOriginalStr">
+                            <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div id="Categories">
         @foreach (var item in Model)
         {
-            bool isOriginal = !item.IsOriginal;
-            string isOriginalStr = item.IsOriginal ? "yes" : "no";
-            <tr hidden="@isOriginal" id="@item.Id-group" class="GroupRows" original="@isOriginalStr">
-                <td>
-                    <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
-                </td>
-            </tr>
-            <tr class="CategoryRows" hidden id="@item.Id-categories">
-                <td>
-                    <button class="btn btn-info BackToGroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
-                    @if (@item.IsMultiChoice)
-                    {
-                        <input class="btn btn-success" type="submit" value="Submit" onclick="AddMultiCategory()" />
-                        <div class="btn-group" data-toggle="buttons-checkbox">
-                            @foreach (var category in item.Categories)
-                            {
-                                <button type="submit" class="btn btn-primary multiChoiceButton" name="@category.Name" value="@category.Name" id="@category.Id">@category.Name</button>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="btn-group" data-toggle="buttons-checkbox">
-                            @foreach (var category in item.Categories)
-                            {
-                                <button onclick="AddCategory(this,@category.Id)" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
-                            }
-                        </div>
-                    }
-                </td>
-            </tr>
+            <div hidden class="CategoryRows @item.Id-categories">
+                @if (@item.IsMultiChoice)
+                {
+                    <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this)" />
+                    <div class="btn-group" data-toggle="buttons-checkbox">
+                        @foreach (var category in item.Categories)
+                        {
+                            <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="btn-group" data-toggle="buttons-checkbox">
+                        @foreach (var category in item.Categories)
+                        {
+                            <button onclick="AddCategory(this,@category.Id)" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
+                        }
+                    </div>
+                }
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+</div>
 
-@section Scripts {
+    @section Scripts {
 
-    <script type="text/javascript">
+        <script type="text/javascript">
         $(document).ready(function () {
-
-            $('#ClearSortButton').hide();
+            $('.multiChoiceButton').on('click', function () {
+                $(".submitMulti-" + this.name).removeClass('hidden');
+            });
 
             $(".GroupButton").on("click", function () {
-                $("#" + this.id + "-categories").toggle();
-                $("#" + this.id + "-group").toggle();
+                $("." + this.id + "-categories").toggle();
              });
 
             $("#ClearSortButton").on("click", function () {
                 $("#ChosenCategories").empty();
                 $(".GroupRows").hide();
                 $(".CategoryRows").hide();
-                $('#ClearSortButton').hide();
+                $('#ClearSortButton').addClass('hidden');
                 $(".GroupRows[original='yes']").show();
                 var path = '@Url.Action("ClearSort","Exercises")';
                 $.ajax({
@@ -81,21 +89,16 @@
                 });
                 $("#ExercisesButton").text('Exercises (' +@ViewBag.NumExercises+')');
                 $('.cbk').each(function () {//uncheck all checkboxes
-                    this.checked = false; 
+                    this.checked = false;
                 });
-            });
-
-            $(".BackToGroupButton").on("click", function () {
-                $("#" + this.id + "-categories").toggle();
-                $("#" + this.id + "-group").toggle();
             });
         });
 
         function AddCategory(e,id) {
-            $(e).closest('tr').hide();
+            $(e).closest('div').hide();
             var path = '@Url.Action("AddSort","Exercises")';
             $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + e.id + '</li>');
-            $('#ClearSortButton').show();
+            $('#ClearSortButton').removeClass('hidden');
             $.ajax({
                 type: "GET",
                 url: path,
@@ -103,22 +106,28 @@
                 success: function (response) {
                     $("#ExercisesButton").text('Exercises (' + response.count + ')');
                     for(i in response.newOptions){
-                        $("#" + response.newOptions[i] + "-group").show();
+                        $("." + response.newOptions[i] + "-group").show();
                     }
                 },
             });
-        }    
+        }
 
-        function AddMultiCategory() {
-            $(".CategoryRows").hide();
+        function AddMultiCategory(cat) {
             var ids = "";
-            $(".multiChoiceButton").each(function (i, obj) {
+            $(".mcb-"+cat.name).each(function (i, obj) {
                 if ($(this).hasClass('active')) {
                     ids += $(this).attr("id") + ",";
-                    $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + $(this).attr("name") + '</li>');
+                    $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + $(this).attr("value") + '</li>');
+                    $(this).removeClass('active');
                 }
             });
-            $('#ClearSortButton').show();
+            if (ids == "") {
+                alert("Please choose at least one option");
+                return;
+            }
+
+            $(".CategoryRows").hide();
+            $('#ClearSortButton').removeClass('hidden');
             var path = '@Url.Action("AddMultiSort","Exercises")';
             $.ajax({
                 type: "GET",
@@ -128,8 +137,9 @@
                 contentType: 'application/json; charset=utf-8',
                 success: function (response) {
                     $("#ExercisesButton").text('Exercises (' + response.count + ')');
+                    $(".submitMulti").addClass('hidden');
                 }
             });
         }
-    </script>
-}
+        </script>
+    }

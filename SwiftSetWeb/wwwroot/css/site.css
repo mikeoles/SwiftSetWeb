@@ -33,19 +33,27 @@
         display: none;
     }
 }
-
-#mainTable{
-    width: 50%;
+#Groups {
+    float: left;
+    display: inline-block;
+    width:auto;
+    height: 100%;
 }
 
-.multiChoiceButton {
-    width: 150px;
-    border-radius: 0px;
+#Categories {
+    float: left;
+    display: inline-block;
+    width: 10%;
+    height: 100%;
 }
 
-.AddCategory {
+#end {
+    display: block;
+}
+.multiChoiceButton, .AddCategory {
     width: 150px;
-    border-radius: 0px;
+    border-radius: 4px !important;
+    margin: 2px 4px 2px 4px;
 }
 
 .GroupButton, .BackToGroupButton{
@@ -74,4 +82,9 @@
 .btn-group {
     margin-bottom: 10px;
     margin-top: 10px;
+}
+
+#ClearSortButton {
+    margin-top: 10px;
+    display: block;
 }
