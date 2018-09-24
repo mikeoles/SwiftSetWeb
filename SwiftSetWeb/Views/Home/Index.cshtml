@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
 <ul id="ChosenCategories" class="list-inline"></ul>
-<div id="end">
+<div id="Selection">
     <div id="Groups">
 
         <table id="mainTable" class="table">
@@ -39,49 +39,61 @@
     <div id="Categories">
         @foreach (var item in Model)
         {
-            <div hidden class="CategoryRows @item.Id-categories">
-                @if (@item.IsMultiChoice)
-                {
-                    <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this)" />
-                    <div class="btn-group" data-toggle="buttons-checkbox">
+        <div hidden class="CategoryRows @item.Id-categories">
+            @if (@item.IsMultiChoice)
+            {
+                <div class="btn-group" data-toggle="buttons-checkbox">
+                    <ul class="categoriesList">
                         @foreach (var category in item.Categories)
                         {
+                        <li>
                             <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
+                        </li>
                         }
-                    </div>
-                }
-                else
-                {
-                    <div class="btn-group" data-toggle="buttons-checkbox">
+                    </ul>
+                </div>
+                <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this,'@item.Name')" />
+            }
+            else
+            {
+                <div class="btn-group" data-toggle="buttons-checkbox">
+                    <ul class="categoriesList">
                         @foreach (var category in item.Categories)
                         {
-                            <button onclick="AddCategory(this,@category.Id)" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
+                            <li>
+                                <button onclick="AddCategory(this,@category.Id,@item.Id,'@item.Name')" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
+                            </li>
                         }
-                    </div>
-                }
-            </div>
+                    </ul>
+                </div>
+            }
+        </div>
         }
     </div>
 </div>
 
-    @section Scripts {
+@section Scripts {
 
-        <script type="text/javascript">
+    <script type="text/javascript">
         $(document).ready(function () {
             $('.multiChoiceButton').on('click', function () {
                 $(".submitMulti-" + this.name).removeClass('hidden');
+                $("#AddCategory").hide();
             });
+
+
 
             $(".GroupButton").on("click", function () {
                 $("." + this.id + "-categories").toggle();
+                $("#AddCategory").hide();
              });
 
             $("#ClearSortButton").on("click", function () {
                 $("#ChosenCategories").empty();
-                $(".GroupRows").hide();
+                $(".GroupRows").closest('tr').hide();
                 $(".CategoryRows").hide();
                 $('#ClearSortButton').addClass('hidden');
-                $(".GroupRows[original='yes']").show();
+                $(".GroupRows[original='yes']").closest('tr').show();
                 var path = '@Url.Action("ClearSort","Exercises")';
                 $.ajax({
                     type: "DELETE",
@@ -94,10 +106,11 @@
             });
         });
 
-        function AddCategory(e,id) {
-            $(e).closest('div').hide();
+            function AddCategory(e, id, hideButton, groupName) {
+                $("." + hideButton + "-categories").toggle();
+            $('.' + hideButton + '-group').closest('tr').hide();
             var path = '@Url.Action("AddSort","Exercises")';
-            $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + e.id + '</li>');
+                $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + e.id + '</li>');
             $('#ClearSortButton').removeClass('hidden');
             $.ajax({
                 type: "GET",
@@ -112,20 +125,23 @@
             });
         }
 
-        function AddMultiCategory(cat) {
+        function AddMultiCategory(cat,groupName) {
             var ids = "";
-            $(".mcb-"+cat.name).each(function (i, obj) {
+            var allCategories = ""
+            $(".mcb-" + cat.name).each(function (i, obj) {
                 if ($(this).hasClass('active')) {
                     ids += $(this).attr("id") + ",";
-                    $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + $(this).attr("value") + '</li>');
+                    allCategories += $(this).attr("value") + "/"
                     $(this).removeClass('active');
                 }
             });
+
             if (ids == "") {
                 alert("Please choose at least one option");
                 return;
             }
 
+            $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + allCategories.slice(0, -1) + '</li>');
             $(".CategoryRows").hide();
             $('#ClearSortButton').removeClass('hidden');
             var path = '@Url.Action("AddMultiSort","Exercises")';
@@ -141,5 +157,5 @@
                 }
             });
         }
-        </script>
-    }
+    </script>
+}
