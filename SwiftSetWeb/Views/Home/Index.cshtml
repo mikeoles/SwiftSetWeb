@@ -7,74 +7,73 @@
 <link rel="stylesheet" href="~/css/index.css" />
 <!-- Scrollbar Custom CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+<div id="categoriesContainer">
+    <ul id="ChosenCategories" class="list-inline"></ul>
+</div>
+<div class="container-fluid">
+    <div class="row">
+        <div id="Selection">
+            <div class="ControlButtons">
+                <button class="btn btn-primary" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
+                <button class="btn btn-primary hidden" id="ClearSortButton">Clear Sorting</button>
+            </div>
+            <div id="Groups">
+                <table id="mainTable" class="table">
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            bool isOriginal = !item.IsOriginal;
+                            string isOriginalStr = item.IsOriginal ? "yes" : "no";
+                            <tr>
+                                <td hidden="@isOriginal" class="GroupRows @item.Id-group" original="@isOriginalStr">
+                                    <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
 
-<ul id="ChosenCategories" class="list-inline"></ul>
-<div id="Selection">
-    <div id="Groups">
-
-        <table id="mainTable" class="table">
-            <tbody>
-                <tr>
-                    <td>
-                        <div class="ControlButtons">
-                            <button class="btn btn-primary" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
-                            <button class="btn btn-primary hidden" id="ClearSortButton">Clear Sorting</button>
-                        </div>
-                    </td>
-                </tr>
+            <div id="Categories">
                 @foreach (var item in Model)
                 {
-                    bool isOriginal = !item.IsOriginal;
-                    string isOriginalStr = item.IsOriginal ? "yes" : "no";
-                    <tr>
-                        <td hidden="@isOriginal" class="GroupRows @item.Id-group" original="@isOriginalStr">
-                            <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
-                        </td>
-                    </tr>
+                    <div hidden class="CategoryRows @item.Id-categories">
+                        @if (@item.IsMultiChoice)
+                        {
+                            <div class="btn-group" data-toggle="buttons-checkbox">
+                                <ul class="categoriesList">
+                                    @foreach (var category in item.Categories)
+                                    {
+                                        <li>
+                                            <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                            <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this,'@item.Name')" />
+                        }
+                        else
+                        {
+                            <div class="btn-group" data-toggle="buttons-checkbox">
+                                <ul class="categoriesList">
+                                    @foreach (var category in item.Categories)
+                                    {
+                                        <li>
+                                            <button onclick="AddCategory(this,@category.Id,@item.Id,'@item.Name')" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
                 }
-            </tbody>
-        </table>
-    </div>
-
-    <div id="Categories">
-        @foreach (var item in Model)
-        {
-        <div hidden class="CategoryRows @item.Id-categories">
-            @if (@item.IsMultiChoice)
-            {
-                <div class="btn-group" data-toggle="buttons-checkbox">
-                    <ul class="categoriesList">
-                        @foreach (var category in item.Categories)
-                        {
-                        <li>
-                            <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
-                        </li>
-                        }
-                    </ul>
-                </div>
-                <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this,'@item.Name')" />
-            }
-            else
-            {
-                <div class="btn-group" data-toggle="buttons-checkbox">
-                    <ul class="categoriesList">
-                        @foreach (var category in item.Categories)
-                        {
-                            <li>
-                                <button onclick="AddCategory(this,@category.Id,@item.Id,'@item.Name')" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
-                            </li>
-                        }
-                    </ul>
-                </div>
-            }
+            </div>
         </div>
-        }
     </div>
 </div>
+    @section Scripts {
 
-@section Scripts {
-
-    <script type="text/javascript">
+        <script type="text/javascript">
         $(document).ready(function () {
             $('.multiChoiceButton').on('click', function () {
                 $(".submitMulti-" + this.name).removeClass('hidden');
@@ -84,8 +83,8 @@
 
 
             $(".GroupButton").on("click", function () {
+                $(".CategoryRows").hide();
                 $("." + this.id + "-categories").toggle();
-                $("#AddCategory").hide();
              });
 
             $("#ClearSortButton").on("click", function () {
@@ -131,7 +130,7 @@
             $(".mcb-" + cat.name).each(function (i, obj) {
                 if ($(this).hasClass('active')) {
                     ids += $(this).attr("id") + ",";
-                    allCategories += $(this).attr("value") + "/"
+                    allCategories += $(this).attr("value").trim() + "/"
                     $(this).removeClass('active');
                 }
             });
@@ -157,5 +156,5 @@
                 }
             });
         }
-    </script>
-}
+        </script>
+    }
