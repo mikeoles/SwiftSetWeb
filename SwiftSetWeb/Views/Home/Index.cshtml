@@ -1,4 +1,4 @@
-@model IEnumerable<SwiftSetWeb.Models.SortingGroup>
+@model ExerciseGroupViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -7,12 +7,13 @@
 <link rel="stylesheet" href="~/css/index.css" />
 <!-- Scrollbar Custom CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
-<div id="categoriesContainer">
-    <ul id="ChosenCategories" class="list-inline"></ul>
-</div>
+
 <div class="container-fluid">
     <div class="row">
         <div id="Selection">
+            <div id="categoriesContainer">
+                <ul id="ChosenCategories" class="list-inline"></ul>
+            </div>
             <div class="ControlButtons">
                 <button class="btn btn-primary" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
                 <button class="btn btn-primary hidden" id="ClearSortButton">Clear Sorting</button>
@@ -20,7 +21,7 @@
             <div id="Groups">
                 <table id="mainTable" class="table">
                     <tbody>
-                        @foreach (var item in Model)
+                        @foreach (var item in Model.SortingGroups)
                         {
                             bool isOriginal = !item.IsOriginal;
                             string isOriginalStr = item.IsOriginal ? "yes" : "no";
@@ -35,7 +36,7 @@
             </div>
 
             <div id="Categories">
-                @foreach (var item in Model)
+                @foreach (var item in Model.SortingGroups)
                 {
                     <div hidden class="CategoryRows @item.Id-categories">
                         @if (@item.IsMultiChoice)
@@ -69,92 +70,99 @@
                 }
             </div>
         </div>
+        <div id="Results">
+            @Html.Partial("_PartialGrid.cshtml",Model.Exercises.ToList());
+        </div>
     </div>
 </div>
-    @section Scripts {
 
-        <script type="text/javascript">
-        $(document).ready(function () {
-            $('.multiChoiceButton').on('click', function () {
-                $(".submitMulti-" + this.name).removeClass('hidden');
-                $("#AddCategory").hide();
-            });
+@section Scripts {
 
-
-
-            $(".GroupButton").on("click", function () {
-                $(".CategoryRows").hide();
-                $("." + this.id + "-categories").toggle();
-             });
-
-            $("#ClearSortButton").on("click", function () {
-                $("#ChosenCategories").empty();
-                $(".GroupRows").closest('tr').hide();
-                $(".CategoryRows").hide();
-                $('#ClearSortButton').addClass('hidden');
-                $(".GroupRows[original='yes']").closest('tr').show();
-                var path = '@Url.Action("ClearSort","Exercises")';
-                $.ajax({
-                    type: "DELETE",
-                    url: path,
-                });
-                $("#ExercisesButton").text('Exercises (' +@ViewBag.NumExercises+')');
-                $('.cbk').each(function () {//uncheck all checkboxes
-                    this.checked = false;
-                });
-            });
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('.multiChoiceButton').on('click', function () {
+            $(".submitMulti-" + this.name).removeClass('hidden');
+            $("#AddCategory").hide();
         });
 
-            function AddCategory(e, id, hideButton, groupName) {
-                $("." + hideButton + "-categories").toggle();
-            $('.' + hideButton + '-group').closest('tr').hide();
-            var path = '@Url.Action("AddSort","Exercises")';
-                $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + e.id + '</li>');
-            $('#ClearSortButton').removeClass('hidden');
-            $.ajax({
-                type: "GET",
-                url: path,
-                data: { categoryId: id },
-                success: function (response) {
-                    $("#ExercisesButton").text('Exercises (' + response.count + ')');
-                    for(i in response.newOptions){
-                        $("." + response.newOptions[i] + "-group").show();
-                    }
-                },
-            });
-        }
-
-        function AddMultiCategory(cat,groupName) {
-            var ids = "";
-            var allCategories = ""
-            $(".mcb-" + cat.name).each(function (i, obj) {
-                if ($(this).hasClass('active')) {
-                    ids += $(this).attr("id") + ",";
-                    allCategories += $(this).attr("value").trim() + "/"
-                    $(this).removeClass('active');
-                }
-            });
-
-            if (ids == "") {
-                alert("Please choose at least one option");
-                return;
-            }
-
-            $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + allCategories.slice(0, -1) + '</li>');
+        $(".GroupButton").on("click", function () {
             $(".CategoryRows").hide();
-            $('#ClearSortButton').removeClass('hidden');
-            var path = '@Url.Action("AddMultiSort","Exercises")';
-            $.ajax({
-                type: "GET",
-                url: path,
-                data: { categoryIds: ids },
-                dataType: "json",
-                contentType: 'application/json; charset=utf-8',
-                success: function (response) {
-                    $("#ExercisesButton").text('Exercises (' + response.count + ')');
-                    $(".submitMulti").addClass('hidden');
-                }
+            $("." + this.id + "-categories").toggle();
             });
-        }
-        </script>
+
+        $("#ClearSortButton").on("click", function () {
+            $("#ChosenCategories").empty();
+            $(".GroupRows").closest('tr').hide();
+            $(".CategoryRows").hide();
+            $('#ClearSortButton').addClass('hidden');
+            $(".GroupRows[original='yes']").closest('tr').show();
+            var path = '@Url.Action("ClearSort","Exercises")';
+            $.ajax({
+                type: "DELETE",
+                url: path,
+            });
+            $("#ExercisesButton").text('Exercises (' +@ViewBag.NumExercises+')');
+            $("#ExerciseTitle").text('Exercises (' +@ViewBag.NumExercises+')');
+            $('.cbk').each(function () {//uncheck all checkboxes
+                this.checked = false;
+            });
+        });
+    });
+
+    function AddCategory(e, id, hideButton, groupName) {
+        $("." + hideButton + "-categories").toggle();
+        $('.' + hideButton + '-group').closest('tr').hide();
+        var path = '@Url.Action("AddSort","Exercises")';
+        $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + e.id + '</li>');
+        $('#ClearSortButton').removeClass('hidden');
+        $.ajax({
+            type: "GET",
+            url: path,
+            data: { categoryId: id },
+        })
+        .done(function (response) {
+            //for (i in response.newOptions) {
+            //    $("." + response.newOptions[i] + "-group").show();
+            //}
+            $("#Results").html(response);
+        })
+        .fail(function (jqXHR, textStatus) {
+            alert("fail");
+        });    
     }
+
+    function AddMultiCategory(cat,groupName) {
+        var ids = "";
+        var allCategories = ""
+        $(".mcb-" + cat.name).each(function (i, obj) {
+            if ($(this).hasClass('active')) {
+                ids += $(this).attr("id") + ",";
+                allCategories += $(this).attr("value").trim() + "/"
+                $(this).removeClass('active');
+            }
+        });
+
+        if (ids == "") {
+            alert("Please choose at least one option");
+            return;
+        }
+
+        $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + allCategories.slice(0, -1) + '</li>');
+        $(".CategoryRows").hide();
+        $('#ClearSortButton').removeClass('hidden');
+        var path = '@Url.Action("AddMultiSort","Exercises")';
+        $.ajax({
+            type: "GET",
+            url: path,
+            data: { categoryIds: ids },
+            dataType: "json",
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                $("#ExercisesButton").text('Exercises (' + response.count + ')');
+                $("#ExerciseTitle").text('Exercises (' + response.count + ')');
+                $(".submitMulti").addClass('hidden');
+            }
+        });
+    }
+    </script>
+}

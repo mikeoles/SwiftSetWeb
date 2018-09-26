@@ -22,11 +22,15 @@ namespace SwiftSetWeb.Controllers
         {
             ExercisesController.Clear();
             ViewBag.NumExercises = _context.Exercises.Count();
-
-            return View(_context.SortingGroups
+            ExerciseGroupViewModel vm = new ExerciseGroupViewModel();
+            vm.SortingGroups = _context.SortingGroups
                 .Include(sg => sg.Categories)
                 .Include(sg => sg.NewOptions)
-                .ThenInclude(sg => sg.SortingCategory));        }
+                .ThenInclude(sg => sg.SortingCategory);
+            vm.Exercises = _context.Exercises;
+
+            return View(vm);
+        }
 
         public IActionResult About()
         {

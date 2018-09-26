@@ -34,7 +34,6 @@
     }
 }
 #Groups {
-    float: left;
     display: inline-block;
     width:auto;
     height: 100%;
@@ -42,10 +41,10 @@
 }
 
 #Categories {
-    float: left;
     display: inline-block;
     width: 10%;
     height: 100%;
+    vertical-align: top;
 }
 
 #end {
@@ -127,8 +126,14 @@ li {
     margin-left: 14px;
 }
 
-#Selection{
-    width: 50%;
+#Selection, #Results {
+    width: 45%;
+    display: inline-block;
+    vertical-align: top;
+}
+
+#Results {
+    margin-top: 10px;
 }
 
 .navbar{
@@ -141,4 +146,8 @@ li {
 
 .navbar-inverse .navbar-nav > li > a {
     color: dimgray;
+}
+
+#ExerciseTitle{
+    margin-top: 0px;
 }

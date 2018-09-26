@@ -38,43 +38,6 @@ namespace SwiftSetWeb.Controllers
             return View(filteredExercises);
         }
 
-        private List<Exercises> GetExercises() {
-            List<Exercises> filteredExercises;
-            if (currentExercises != null)
-            {
-                filteredExercises = currentExercises;
-            }
-            else
-            {
-                filteredExercises = _context.Exercises.ToList();
-            }
-            return filteredExercises;
-        }
-
-        //Search for all the exercises that are push, pull, or legs movements
-        private List<Exercises> PushPullLegsSearch(string name, string columnName, List<Exercises> sortedExercises) {
-            List<string> muscles = new List<string>();
-            List<string> pull = new List<string>(new string[] { "Lats", "Traps", "Biceps", "Rear Delts" });
-            List<string> push = new List<string>(new string[] { "Chest", "Triceps", "Shoulders" });
-            List<string> legs = new List<string>(new string[] { "Quads", "Hamstrings", "Calf", "Glutes", "Hips" });
-
-            switch (name.Trim())
-            {
-                case "Push":
-                    muscles = push;
-                    break;
-                case "Pull":
-                    muscles = pull;
-                    break;
-                case "Legs":
-                    muscles = legs;
-                    break;
-            }
-
-            //Loop through each of the muscles in the list and check if the column contains any of those values
-            return sortedExercises.Where(e => muscles.Any(muscle => e.GetType().GetProperty(columnName).GetValue(e, null).ToString() == muscle)).ToList();
-        }
-
         //Adds a category to sort by when viewing the list of exercises and return the count of how many exercises are remaining
         [HttpGet]
         public ActionResult AddSort(int? categoryId) {
@@ -110,8 +73,8 @@ namespace SwiftSetWeb.Controllers
             }
             currentSortingCategory = null;
             currentExercises = filteredExercises;
-
-            var genericResult = new { Count = filteredExercises.Count(), NewOptions = newOpts };
+            return PartialView("Views/Home/_PartialGrid.cshtml", currentExercises);
+            var genericResult = new { Count = filteredExercises.Count(), NewOptions = newOpts, Grid = PartialView("_PartialGrid.cshtml", currentExercises) };
             return new JsonResult(genericResult);
         }
 
@@ -195,13 +158,50 @@ namespace SwiftSetWeb.Controllers
             return View("~/Views/Exercises/Details.cshtml", exercise);
         }
 
+        private List<Exercises> GetExercises() {
+            List<Exercises> filteredExercises;
+            if (currentExercises != null)
+            {
+                filteredExercises = currentExercises;
+            }
+            else
+            {
+                filteredExercises = _context.Exercises.ToList();
+            }
+            return filteredExercises;
+        }
+
+        //Search for all the exercises that are push, pull, or legs movements
+        private List<Exercises> PushPullLegsSearch(string name, string columnName, List<Exercises> sortedExercises) {
+            List<string> muscles = new List<string>();
+            List<string> pull = new List<string>(new string[] { "Lats", "Traps", "Biceps", "Rear Delts" });
+            List<string> push = new List<string>(new string[] { "Chest", "Triceps", "Shoulders" });
+            List<string> legs = new List<string>(new string[] { "Quads", "Hamstrings", "Calf", "Glutes", "Hips" });
+
+            switch (name.Trim())
+            {
+                case "Push":
+                    muscles = push;
+                    break;
+                case "Pull":
+                    muscles = pull;
+                    break;
+                case "Legs":
+                    muscles = legs;
+                    break;
+            }
+
+            //Loop through each of the muscles in the list and check if the column contains any of those values
+            return sortedExercises.Where(e => muscles.Any(muscle => e.GetType().GetProperty(columnName).GetValue(e, null).ToString() == muscle)).ToList();
+        }
+
         private bool ExercisesExists(int id)
         {
             return _context.Exercises.Any(e => e.Id == id);
         }
 
         //Finds the start time and video code of a youtube video and returns it as a YoutubeData class
-        public static YoutubeData parseYoutubeUrl(String selectedUrl)
+        private static YoutubeData parseYoutubeUrl(String selectedUrl)
         {
             //separate the youtube video code and time from the url
             String youtubeCode = "", videoCode;

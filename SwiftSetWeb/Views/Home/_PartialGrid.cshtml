@@ -1,0 +1,27 @@
+﻿@model List<Exercises>
+
+
+<h2 id="ExerciseTitle">Exercises (@Model.Count())</h2>
+<form asp-controller="Exercises" asp-action="Index">
+    <p>
+        @*TODO: Add searchtext in value*@
+        <input id="searchBox" type="text" name="SearchString">
+    </p>
+</form>
+<input class="btn btn-info" type="button" value="Choose Random" onclick="location.href='@Url.Action("Random", "Exercises")'" />
+<table class="table">
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if (Model.Count() == 0)
+{
+    <p>No exercises found matching current search</p>
+}
