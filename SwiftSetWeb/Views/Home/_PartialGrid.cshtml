@@ -1,16 +1,11 @@
 ﻿@model List<Exercises>
 
-
-<h2 id="ExerciseTitle">Exercises (@Model.Count())</h2>
-<form asp-controller="Exercises" asp-action="Index">
-    <p>
-        @*TODO: Add searchtext in value*@
-        <input id="searchBox" type="text" name="SearchString">
-    </p>
-</form>
-<input class="btn btn-info" type="button" value="Choose Random" onclick="location.href='@Url.Action("Random", "Exercises")'" />
-<table class="table">
-    <tbody>
+<div id="searchHeader">
+    <h4 id="ExerciseTitle">@Model.Count() Exercises</h4>
+    <input id="randomButton" class="btn btn-info" type="button" value="Choose Random" onclick="location.href='@Url.Action("Random", "Exercises")'" />
+</div>
+<table class="table table-striped exerciseTable">
+    <tbody class="exerciseTableBody">
         @foreach (var item in Model)
         {
             <tr>

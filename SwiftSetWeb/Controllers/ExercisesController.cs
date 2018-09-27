@@ -35,7 +35,7 @@ namespace SwiftSetWeb.Controllers
                 ViewBag.searchText = searchString;
             }
 
-            return View(filteredExercises);
+            return PartialView("Views/Home/_PartialGrid.cshtml", filteredExercises);
         }
 
         //Adds a category to sort by when viewing the list of exercises and return the count of how many exercises are remaining
@@ -74,8 +74,6 @@ namespace SwiftSetWeb.Controllers
             currentSortingCategory = null;
             currentExercises = filteredExercises;
             return PartialView("Views/Home/_PartialGrid.cshtml", currentExercises);
-            var genericResult = new { Count = filteredExercises.Count(), NewOptions = newOpts, Grid = PartialView("_PartialGrid.cshtml", currentExercises) };
-            return new JsonResult(genericResult);
         }
 
         [HttpGet]
@@ -101,9 +99,8 @@ namespace SwiftSetWeb.Controllers
                 multiChoiceCategories.Clear();
             }
             currentExercises = filteredExercises;
-
-            var genericResult = new { Count = filteredExercises.Count() };
-            return new JsonResult(genericResult);
+        
+            return PartialView("Views/Home/_PartialGrid.cshtml", currentExercises);
         }
 
         public static void Clear() {

@@ -15,7 +15,6 @@
                 <ul id="ChosenCategories" class="list-inline"></ul>
             </div>
             <div class="ControlButtons">
-                <button class="btn btn-primary" id="ExercisesButton" type="button" onclick="location.href='@Url.Action("Index", "Exercises")'">Exercises (@ViewBag.NumExercises)</button>
                 <button class="btn btn-primary hidden" id="ClearSortButton">Clear Sorting</button>
             </div>
             <div id="Groups">
@@ -71,7 +70,14 @@
             </div>
         </div>
         <div id="Results">
-            @Html.Partial("_PartialGrid.cshtml",Model.Exercises.ToList());
+            <form id="searchForm">
+                <p>
+                    <input id="searchBox" type="text" name="SearchString">
+                </p>
+            </form>
+            <div id="SearchResults">
+                @Html.Partial("_PartialGrid.cshtml", Model.Exercises.ToList());
+            </div>
         </div>
     </div>
 </div>
@@ -79,90 +85,111 @@
 @section Scripts {
 
     <script type="text/javascript">
-    $(document).ready(function () {
-        $('.multiChoiceButton').on('click', function () {
-            $(".submitMulti-" + this.name).removeClass('hidden');
-            $("#AddCategory").hide();
-        });
+        $(document).ready(function () {
 
-        $(".GroupButton").on("click", function () {
-            $(".CategoryRows").hide();
-            $("." + this.id + "-categories").toggle();
+
+            $('.multiChoiceButton').on('click', function () {
+                $(".submitMulti-" + this.name).removeClass('hidden');
+                $("#AddCategory").hide();
             });
 
-        $("#ClearSortButton").on("click", function () {
-            $("#ChosenCategories").empty();
-            $(".GroupRows").closest('tr').hide();
-            $(".CategoryRows").hide();
-            $('#ClearSortButton').addClass('hidden');
-            $(".GroupRows[original='yes']").closest('tr').show();
-            var path = '@Url.Action("ClearSort","Exercises")';
+            $(".GroupButton").on("click", function () {
+                $(".CategoryRows").hide();
+                $("." + this.id + "-categories").toggle();
+                });
+
+            $("#ClearSortButton").on("click", function () {
+                $("#ChosenCategories").empty();
+                $(".GroupRows").closest('tr').hide();
+                $(".CategoryRows").hide();
+                $('#ClearSortButton').addClass('hidden');
+                $(".GroupRows[original='yes']").closest('tr').show();
+                var path = '@Url.Action("ClearSort","Exercises")';
+                $.ajax({
+                    type: "DELETE",
+                    url: path,
+                });
+                $('.cbk').each(function () {//uncheck all checkboxes
+                    this.checked = false;
+                });
+            });
+        });
+
+        $(document).on('keyup', '#searchBox', function (e) {  
+            var delay = (function () {
+                var timer = 0;
+                return function (callback, ms) {
+                    clearTimeout(timer);
+                    timer = setTimeout(callback, ms);
+                };
+            })();
+
+            delay(function () {
+                var path = '@Url.Action("Index","Exercises")';
+                
+                    $.ajax({
+                        type: "GET",
+                        url: path,
+                        data: { searchString: $("#searchBox").val() },
+                    })
+                    .done(function (response) {
+                        $("#SearchResults").html(response);
+                    });
+            }, 1000);
+        });
+
+        function AddCategory(e, id, hideButton, groupName) {
+            $("." + hideButton + "-categories").toggle();
+            $('.' + hideButton + '-group').closest('tr').hide();
+            var path = '@Url.Action("AddSort","Exercises")';
+            $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + e.id + '</li>');
+            $('#ClearSortButton').removeClass('hidden');
             $.ajax({
-                type: "DELETE",
+                type: "GET",
                 url: path,
-            });
-            $("#ExercisesButton").text('Exercises (' +@ViewBag.NumExercises+')');
-            $("#ExerciseTitle").text('Exercises (' +@ViewBag.NumExercises+')');
-            $('.cbk').each(function () {//uncheck all checkboxes
-                this.checked = false;
-            });
-        });
-    });
-
-    function AddCategory(e, id, hideButton, groupName) {
-        $("." + hideButton + "-categories").toggle();
-        $('.' + hideButton + '-group').closest('tr').hide();
-        var path = '@Url.Action("AddSort","Exercises")';
-        $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + e.id + '</li>');
-        $('#ClearSortButton').removeClass('hidden');
-        $.ajax({
-            type: "GET",
-            url: path,
-            data: { categoryId: id },
-        })
-        .done(function (response) {
-            //for (i in response.newOptions) {
-            //    $("." + response.newOptions[i] + "-group").show();
-            //}
-            $("#Results").html(response);
-        })
-        .fail(function (jqXHR, textStatus) {
-            alert("fail");
-        });    
-    }
-
-    function AddMultiCategory(cat,groupName) {
-        var ids = "";
-        var allCategories = ""
-        $(".mcb-" + cat.name).each(function (i, obj) {
-            if ($(this).hasClass('active')) {
-                ids += $(this).attr("id") + ",";
-                allCategories += $(this).attr("value").trim() + "/"
-                $(this).removeClass('active');
-            }
-        });
-
-        if (ids == "") {
-            alert("Please choose at least one option");
-            return;
+                data: { categoryId: id },
+            })
+                .done(function (response) {
+                //TODO
+                //for (i in response.newOptions) {
+                //    $("." + response.newOptions[i] + "-group").show();
+                //}
+                $("#SearchResults").html(response);
+            })
+            .fail(function (jqXHR, textStatus) {
+                alert("fail");
+            });    
         }
 
-        $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + allCategories.slice(0, -1) + '</li>');
-        $(".CategoryRows").hide();
-        $('#ClearSortButton').removeClass('hidden');
-        var path = '@Url.Action("AddMultiSort","Exercises")';
-        $.ajax({
-            type: "GET",
-            url: path,
-            data: { categoryIds: ids },
-            dataType: "json",
-            contentType: 'application/json; charset=utf-8',
-            success: function (response) {
-                $("#ExercisesButton").text('Exercises (' + response.count + ')');
-                $("#ExerciseTitle").text('Exercises (' + response.count + ')');
-                $(".submitMulti").addClass('hidden');
+        function AddMultiCategory(cat,groupName) {
+            var ids = "";
+            var allCategories = ""
+            $(".mcb-" + cat.name).each(function (i, obj) {
+                if ($(this).hasClass('active')) {
+                    ids += $(this).attr("id") + ",";
+                    allCategories += $(this).attr("value").trim() + "/"
+                    $(this).removeClass('active');
+                }
+            });
+
+            if (ids == "") {
+                alert("Please choose at least one option");
+                return;
             }
-        });
-    }
+
+            $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + allCategories.slice(0, -1) + '</li>');
+            $(".CategoryRows").hide();
+            $('#ClearSortButton').removeClass('hidden');
+            var path = '@Url.Action("AddMultiSort","Exercises")';
+            $.ajax({
+                type: "GET",
+                url: path,
+                data: { categoryIds: ids },
+            })
+            .done(function (response) {
+                $(".submitMulti").addClass('hidden');
+                $("#SearchResults").html(response);
+            });
+        }
     </script>
 }

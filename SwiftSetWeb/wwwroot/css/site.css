@@ -134,6 +134,7 @@ li {
 
 #Results {
     margin-top: 10px;
+    width: auto;
 }
 
 .navbar{
@@ -150,4 +151,34 @@ li {
 
 #ExerciseTitle{
     margin-top: 0px;
+}
+
+#ExerciseTitle, #randomButton {
+    display: inline-block;
+}
+
+
+#randomButton{
+    margin-left: 140px;
+
+}
+#searchBox{
+    display: block;
+    width: 100%;
+}
+
+#searchHeader{
+    display: block;
+}
+
+.exerciseTable{
+    width: auto;
+    text-align: center;
+}
+
+.exerciseTableBody {
+    display: block;
+    height: 600px; /* Just for the demo          */
+    overflow-y: auto; /* Trigger vertical scroll    */
+    overflow-x: hidden; /* Hide the horizontal scroll */
 }
