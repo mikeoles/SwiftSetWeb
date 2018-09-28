@@ -19,6 +19,7 @@ namespace SwiftSetWeb.Controllers
         private static readonly String shortUrl = "youtu.be/";
         private static SortingCategory currentSortingCategory = new SortingCategory();
         private static List<SortingCategory> multiChoiceCategories = new List<SortingCategory>();
+        private static List<int> newOpts = new List<int>();
 
         public ExercisesController(SwiftSetContext context) {
             _context = context;
@@ -50,7 +51,6 @@ namespace SwiftSetWeb.Controllers
             {
                 currentSortingCategory = sortingCategory;
             }
-            List<int> newOpts = new List<int>();
             foreach (NewOptions option in sortingCategory.NewOptions)
             {
                 newOpts.Add(option.SortingGroupId);
@@ -74,6 +74,13 @@ namespace SwiftSetWeb.Controllers
             currentSortingCategory = null;
             currentExercises = filteredExercises;
             return PartialView("Views/Home/_PartialGrid.cshtml", currentExercises);
+        }
+
+        [HttpGet]
+        public ActionResult NewOptions() {
+            int[] curNewOpts = newOpts.ToArray(); // instance method
+            newOpts.Clear();
+            return new JsonResult(curNewOpts);
         }
 
         [HttpGet]

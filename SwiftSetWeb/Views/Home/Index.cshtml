@@ -157,12 +157,18 @@
                 url: path,
                 data: { categoryId: id },
             })
-                .done(function (response) {
-                //TODO
-                //for (i in response.newOptions) {
-                //    $("." + response.newOptions[i] + "-group").show();
-                //}
+            .done(function (response) {
                 $("#SearchResults").html(response);
+                var path = '@Url.Action("NewOptions","Exercises")';
+                $.ajax({
+                    type: "GET",
+                    url: path
+                })
+                .done(function (response) {
+                    for (i in response) {
+                        $("." + response[i] + "-group").show();
+                    }
+                });
             })
             .fail(function (jqXHR, textStatus) {
                 alert("fail");

@@ -67,9 +67,11 @@
     padding: 0px;
 }
 
-.GroupButton{
+.GroupButton {
     width: 200px;
     margin-left: 10px;
+    background-color: #0288d1;
+    border: #0288d1;
 }
 
 .CategoryRows {
@@ -106,7 +108,7 @@
 
 #ChosenCategories li {
     padding: 5px 20px 5px 20px;
-    background-color: #337ab7;
+    background-color: #0288d1;
     color: white;
     border-right: 2px solid white;
     text-align: center;
@@ -156,8 +158,9 @@ li {
     width: auto;
 }
 
-.navbar{
+.navbar {
     background-color: #e8e3e3;
+    border-bottom-color: #fdd835;
 }
 
 .navbar-inverse .navbar-brand {
@@ -176,8 +179,10 @@ li {
     display: inline-block;
 }
 
-#randomButton{
+#randomButton {
     margin-left: 70px;
+    background-color: #0288d1;
+    border: #0288d1;
 }
 
 #searchBox{
