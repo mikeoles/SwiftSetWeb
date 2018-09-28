@@ -33,6 +33,7 @@
         display: none;
     }
 }
+
 #Groups {
     display: inline-block;
     width:auto;
@@ -50,12 +51,14 @@
 #end {
     display: block;
 }
+
 .multiChoiceButton, .AddCategory {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
     border-radius: 4px !important;
     margin: 2px;
     white-space: normal;
+    padding: 0px;
 }
 
 .GroupButton{
@@ -115,7 +118,7 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    max-height: 600px;
+    max-height: 500px;
 }
 
 li {
@@ -133,7 +136,7 @@ li {
 }
 
 #Results {
-    margin-top: 10px;
+    margin: 20px;
     width: auto;
 }
 
@@ -157,11 +160,10 @@ li {
     display: inline-block;
 }
 
-
 #randomButton{
     margin-left: 140px;
-
 }
+
 #searchBox{
     display: block;
     width: 100%;
@@ -172,13 +174,18 @@ li {
 }
 
 .exerciseTable{
-    width: auto;
     text-align: center;
+    margin-top: 10px;
 }
 
 .exerciseTableBody {
     display: block;
     height: 600px; /* Just for the demo          */
+    max-height: 100%;
     overflow-y: auto; /* Trigger vertical scroll    */
     overflow-x: hidden; /* Hide the horizontal scroll */
+}
+
+.exerciseTableBody tr {
+    width: 400px;
 }

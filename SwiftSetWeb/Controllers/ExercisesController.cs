@@ -108,9 +108,11 @@ namespace SwiftSetWeb.Controllers
             multiChoiceCategories.Clear();
         }
 
-        [HttpDelete]
-        public void ClearSort() {
+        [HttpGet]
+        public ActionResult ClearSort() {
             Clear();
+            currentExercises = GetExercises();
+            return PartialView("Views/Home/_PartialGrid.cshtml", currentExercises);
         }
 
         // GET: Exercises/Details/5
