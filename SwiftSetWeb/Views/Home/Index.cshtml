@@ -20,12 +20,12 @@
                 @Html.Partial("_PartialGrid.cshtml", Model.Exercises.ToList());
             </div>
         </div>
+        <div id="categoriesContainer">
+            <button class="btn btn-danger hidden" id="ClearSortButton">Clear Sorting</button>
+            <ul id="ChosenCategories"></ul>
+        </div>
         <div id="Selection">
-            <div id="categoriesContainer">
-                <ul id="ChosenCategories" class="list-inline"></ul>
-            </div>
             <div class="ControlButtons">
-                <button class="btn btn-primary hidden" id="ClearSortButton">Clear Sorting</button>
             </div>
             <div id="Groups">
                 <table id="mainTable" class="table">
@@ -94,9 +94,14 @@
             });
 
             $(".GroupButton").on("click", function () {
-                $(".CategoryRows").hide();
-                $("." + this.id + "-categories").toggle();
-                });
+                if ($("." + this.id + "-categories").is(":hidden")) {
+                    $(".CategoryRows").hide();
+                    $("." + this.id + "-categories").show();
+                } else {
+                    $(".CategoryRows").hide();
+                } 
+
+            });
 
             $("#ClearSortButton").on("click", function () {
                 $("#ChosenCategories").empty();

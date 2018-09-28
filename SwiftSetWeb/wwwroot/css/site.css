@@ -34,6 +34,12 @@
     }
 }
 
+#ClearSortButton{
+    margin-top: 20px;
+    display: block;
+    margin: auto;
+}
+
 #Groups {
     display: inline-block;
     width:auto;
@@ -93,16 +99,21 @@
     margin-top: 10px;
 }
 
+#ChosenCategories {
+    display: inline-block;
+    padding: 0px;
+}
+
 #ChosenCategories li {
-    padding: 5px 10px 5px 10px;
+    padding: 5px 20px 5px 20px;
     background-color: #337ab7;
     color: white;
     border-right: 2px solid white;
     text-align: center;
     font-weight: 700;
     font-size: 12px;
-    margin: 10px 10px 0px 10px;
-    display: inline-block;
+    margin-top: 10px;
+    display: block;
 }
 
 .btn-primary.active, .btn-primary.active:hover, .btn-primary:active, .btn-primary.active:focus {
@@ -126,13 +137,18 @@ li {
 }
 
 #categoriesContainer {
-    margin-left: 14px;
+    display: inline-block;
+    margin-top: 20px;
 }
 
 #Selection, #Results {
     width: 45%;
     display: inline-block;
     vertical-align: top;
+}
+
+#Selection{
+    margin-top: 8px;
 }
 
 #Results {
@@ -161,7 +177,7 @@ li {
 }
 
 #randomButton{
-    margin-left: 140px;
+    margin-left: 70px;
 }
 
 #searchBox{
@@ -176,16 +192,23 @@ li {
 .exerciseTable{
     text-align: center;
     margin-top: 10px;
+    width: 300px;
+    align-content: center;
 }
 
 .exerciseTableBody {
     display: block;
-    height: 600px; /* Just for the demo          */
+    height: 400px; 
     max-height: 100%;
     overflow-y: auto; /* Trigger vertical scroll    */
     overflow-x: hidden; /* Hide the horizontal scroll */
 }
 
-.exerciseTableBody tr {
-    width: 400px;
+.exerciseTableBody tr td {
+    text-wrap:normal;
+    min-width: 300px;
+}
+
+.container {
+    margin-left: 0px;
 }
