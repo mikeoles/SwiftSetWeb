@@ -10,83 +10,69 @@
 
 <div class="container-fluid">
     <div class="row">
-        <div id="Results">
-            <form id="searchForm">
-                <p>
-                    <input id="searchBox" type="text" name="SearchString">
-                </p>
-            </form>
-            <div id="SearchResults">
-                @Html.Partial("_PartialGrid.cshtml", Model.Exercises.ToList());
-            </div>
-        </div>
-        <div id="categoriesContainer">
-            <button class="btn btn-danger hidden" id="ClearSortButton">Clear Sorting</button>
-            <ul id="ChosenCategories"></ul>
-        </div>
-        <div id="Selection">
-            <div class="ControlButtons">
-            </div>
+        <div class="Selection">
             <div id="Groups">
-                <table id="mainTable" class="table">
-                    <tbody>
-                        @foreach (var item in Model.SortingGroups)
-                        {
-                            bool isOriginal = !item.IsOriginal;
-                            string isOriginalStr = item.IsOriginal ? "yes" : "no";
-                            <tr>
-                                <td hidden="@isOriginal" class="GroupRows @item.Id-group" original="@isOriginalStr">
-                                    <button class="btn btn-info GroupButton" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="Categories">
                 @foreach (var item in Model.SortingGroups)
                 {
-                    <div hidden class="CategoryRows @item.Id-categories">
-                        @if (@item.IsMultiChoice)
-                        {
-                            <div class="btn-group" data-toggle="buttons-checkbox">
-                                <ul class="categoriesList">
-                                    @foreach (var category in item.Categories)
-                                    {
-                                        <li>
-                                            <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                            <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this,'@item.Name')" />
-                        }
-                        else
-                        {
-                            <div class="btn-group" data-toggle="buttons-checkbox">
-                                <ul class="categoriesList">
-                                    @foreach (var category in item.Categories)
-                                    {
-                                        <li>
-                                            <button onclick="AddCategory(this,@category.Id,@item.Id,'@item.Name')" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
-                                        </li>
-                                    }
-                                </ul>
-                            </div>
-                        }
-                    </div>
+                    string isOriginalStr = item.IsOriginal ? "yes" : "no";
+                    <button original="@isOriginalStr" class="btn hidden btn-primary GroupButton @item.Id-group" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
                 }
             </div>
         </div>
+        <div class="Selection">
+            @foreach (var item in Model.SortingGroups)
+            {
+                <div hidden class="CategoryRows @item.Id-categories">
+                    @if (@item.IsMultiChoice)
+                    {
+                        <div class="btn-group" data-toggle="buttons-checkbox">
+                            @foreach (var category in item.Categories)
+                            {
+                                    <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
+                            }
+                        </div>
+                        <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this,'@item.Name')" />
+                    }
+                    else
+                    {
+                        <div class="btn-group">
+                            @foreach (var category in item.Categories)
+                            {
+                                    <button onclick="AddCategory(this,@category.Id,@item.Id,'@item.Name')" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
     </div>
-</div>
+    <div class="row">
+            <div id="categoriesContainer">
+                <button class="btn btn-danger hidden" id="ClearSortButton">Clear Sorting</button>
+                <ul id="ChosenCategories"></ul>
+            </div>
+            <div id="Results">
+                <form id="searchForm">
+                    <p>
+                        <input id="searchBox" type="text" name="SearchString">
+                    </p>
+                </form>
+                <div id="SearchResults">
+                    @Html.Partial("_PartialGrid.cshtml", Model.Exercises.ToList());
+                </div>
+            </div>
+        </div>
+    </div>
 
 @section Scripts {
 
     <script type="text/javascript">
         $(document).ready(function () {
-
+            $('.GroupButton').each(function () {
+                if ($(this).attr('original') == 'yes') {
+                    $(this).removeClass('hidden');
+                }
+            });
 
             $('.multiChoiceButton').on('click', function () {
                 $(".submitMulti-" + this.name).removeClass('hidden');
@@ -94,21 +80,22 @@
             });
 
             $(".GroupButton").on("click", function () {
+                $("#Groups").hide();
+                $("#Categories").show();
                 if ($("." + this.id + "-categories").is(":hidden")) {
                     $(".CategoryRows").hide();
                     $("." + this.id + "-categories").show();
                 } else {
                     $(".CategoryRows").hide();
-                } 
-
+                }
             });
 
             $("#ClearSortButton").on("click", function () {
                 $("#ChosenCategories").empty();
-                $(".GroupRows").closest('tr').hide();
+                $(".GroupButton").addClass('hidden');
                 $(".CategoryRows").hide();
                 $('#ClearSortButton').addClass('hidden');
-                $(".GroupRows[original='yes']").closest('tr').show();
+                $(".GroupButton[original='yes']").removeClass('hidden');
                 var path = '@Url.Action("ClearSort","Exercises")';
                 $.ajax({
                     type: "GET",
@@ -123,7 +110,7 @@
             });
         });
 
-        $(document).on('keyup', '#searchBox', function (e) {  
+        $(document).on('keyup', '#searchBox', function (e) {
             var delay = (function () {
                 var timer = 0;
                 return function (callback, ms) {
@@ -134,7 +121,7 @@
 
             delay(function () {
                 var path = '@Url.Action("Index","Exercises")';
-                
+
                     $.ajax({
                         type: "GET",
                         url: path,
@@ -147,6 +134,7 @@
         });
 
         function AddCategory(e, id, hideButton, groupName) {
+            $("#Groups").show();
             $("." + hideButton + "-categories").toggle();
             $('.' + hideButton + '-group').closest('tr').hide();
             var path = '@Url.Action("AddSort","Exercises")';
@@ -172,7 +160,7 @@
             })
             .fail(function (jqXHR, textStatus) {
                 alert("fail");
-            });    
+            });
         }
 
         function AddMultiCategory(cat,groupName) {
