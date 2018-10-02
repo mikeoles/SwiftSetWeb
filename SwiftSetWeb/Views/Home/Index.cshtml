@@ -9,13 +9,13 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
 
 <div class="container-fluid">
-    <div class="row">
+    <div class="row top-buffer">
         <div class="Selection">
             <div id="Groups">
                 @foreach (var item in Model.SortingGroups)
                 {
                     string isOriginalStr = item.IsOriginal ? "yes" : "no";
-                    <button original="@isOriginalStr" class="btn hidden btn-primary GroupButton @item.Id-group" id="@item.Id">@Html.DisplayFor(modelItem => item.Name)</button>
+                    <button original="@isOriginalStr" class="btn hidden btn-primary GroupButton @item.Id-group" id="@item.Id"><div class="verticalCenter">@Html.DisplayFor(modelItem => item.Name)</div></button>
                 }
             </div>
         </div>
@@ -25,49 +25,56 @@
                 <div hidden class="CategoryRows @item.Id-categories">
                     @if (@item.IsMultiChoice)
                     {
-                        <div class="btn-group" data-toggle="buttons-checkbox">
+                        <div data-toggle="buttons-checkbox">
                             @foreach (var category in item.Categories)
                             {
-                                    <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
+                                <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
                             }
                         </div>
                         <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this,'@item.Name')" />
                     }
                     else
                     {
-                        <div class="btn-group">
-                            @foreach (var category in item.Categories)
-                            {
-                                    <button onclick="AddCategory(this,@category.Id,@item.Id,'@item.Name')" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
-                            }
-                        </div>
+                        @foreach (var category in item.Categories)
+                        {
+                            <button onclick="AddCategory(this,@category.Id,@item.Id,'@item.Name')" class="btn btn-primary AddCategory" id="@category.Name">@Html.DisplayFor(modelItem => category.Name)</button>
+                        }
                     }
                 </div>
             }
         </div>
     </div>
     <div class="row">
+    </div>
+    <div class="row">
+        <div class="col-sm-3">
             <div id="categoriesContainer">
+                <div class="sortingTitle">Applied Sorting</div>
+                <ol id="ChosenCategories"></ol>
                 <button class="btn btn-danger hidden" id="ClearSortButton">Clear Sorting</button>
-                <ul id="ChosenCategories"></ul>
             </div>
+        </div>
+        <div class="col-sm-6">
             <div id="Results">
                 <form id="searchForm">
                     <p>
-                        <input id="searchBox" type="text" name="SearchString">
+                        <input class="form-control" id="searchBox" type="text" name="SearchString">
                     </p>
                 </form>
                 <div id="SearchResults">
-                    @Html.Partial("_PartialGrid.cshtml", Model.Exercises.ToList());
+                    @Html.Partial("_PartialGrid.cshtml", Model.Exercises.ToList())
                 </div>
             </div>
         </div>
+        <div class="col-sm-3"></div>
     </div>
+</div>
 
 @section Scripts {
 
     <script type="text/javascript">
         $(document).ready(function () {
+
             $('.GroupButton').each(function () {
                 if ($(this).attr('original') == 'yes') {
                     $(this).removeClass('hidden');
@@ -119,57 +126,44 @@
                 };
             })();
 
-            delay(function () {
-                var path = '@Url.Action("Index","Exercises")';
-
-                    $.ajax({
-                        type: "GET",
-                        url: path,
-                        data: { searchString: $("#searchBox").val() },
-                    })
-                    .done(function (response) {
-                        $("#SearchResults").html(response);
-                    });
-            }, 1000);
+            delay(function () {runSearch()}, 1000);
         });
 
         function AddCategory(e, id, hideButton, groupName) {
             $("#Groups").show();
             $("." + hideButton + "-categories").toggle();
-            $('.' + hideButton + '-group').closest('tr').hide();
+            $('.' + hideButton + '-group').addClass('hidden');
             var path = '@Url.Action("AddSort","Exercises")';
-            $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + e.id + '</li>');
+            $("#ChosenCategories").append('<li>' + groupName + ': ' + e.id + '</li>');
             $('#ClearSortButton').removeClass('hidden');
             $.ajax({
                 type: "GET",
                 url: path,
                 data: { categoryId: id },
             })
-            .done(function (response) {
-                $("#SearchResults").html(response);
-                var path = '@Url.Action("NewOptions","Exercises")';
-                $.ajax({
-                    type: "GET",
-                    url: path
-                })
                 .done(function (response) {
-                    for (i in response) {
-                        $("." + response[i] + "-group").show();
-                    }
+                    $("#SearchResults").html(response);
+                    var path = '@Url.Action("NewOptions","Exercises")';
+                    $.ajax({
+                        type: "GET",
+                        url: path
+                    })
+                        .done(function (response) {
+                            for (i in response) {
+                                $("." + response[i] + "-group").removeClass('hidden');
+                            }
+                        });
                 });
-            })
-            .fail(function (jqXHR, textStatus) {
-                alert("fail");
-            });
         }
 
-        function AddMultiCategory(cat,groupName) {
+        function AddMultiCategory(cat, groupName) {
+            $("#Groups").show();
             var ids = "";
             var allCategories = ""
             $(".mcb-" + cat.name).each(function (i, obj) {
                 if ($(this).hasClass('active')) {
                     ids += $(this).attr("id") + ",";
-                    allCategories += $(this).attr("value").trim() + "/"
+                    allCategories += $(this).attr("value").trim() + "/ "
                     $(this).removeClass('active');
                 }
             });
@@ -179,7 +173,7 @@
                 return;
             }
 
-            $("#ChosenCategories").append('<li class="list-inline-item list-group-item-info">' + groupName + '<br/>' + allCategories.slice(0, -1) + '</li>');
+            $("#ChosenCategories").append('<li>' + groupName + ': ' + allCategories.slice(0, -2) + '</li>');
             $(".CategoryRows").hide();
             $('#ClearSortButton').removeClass('hidden');
             var path = '@Url.Action("AddMultiSort","Exercises")';
@@ -193,5 +187,29 @@
                 $("#SearchResults").html(response);
             });
         }
+
+        //function fixButtonHeight() {
+        //    var maxHeight = -1;
+        //    $('.resultsButton').each(function () {
+        //        maxHeight = maxHeight > $(this).height() ? maxHeight : $(this).height();
+        //    });
+        //    $('.resultsButton').each(function () {
+        //        $(this).css("line-height", maxHeight+"px");;
+        //    });
+        //}
+
+        function runSearch() {
+            var path = '@Url.Action("Index","Exercises")';
+
+            $.ajax({
+                type: "GET",
+                url: path,
+                data: { searchString: $("#searchBox").val() },
+            })
+            .done(function (response) {
+                $("#SearchResults").html(response);
+            });
+        }
+
     </script>
 }
