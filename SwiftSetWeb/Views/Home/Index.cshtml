@@ -117,6 +117,12 @@
             });
         });
 
+        $(window).resize(function () {
+            $("#SearchResults").html("");
+            runSearch();
+            setTimeout(fixButtonHeight, 1000)
+        });
+
         $(document).on('keyup', '#searchBox', function (e) {
             var delay = (function () {
                 var timer = 0;
@@ -187,16 +193,6 @@
                 $("#SearchResults").html(response);
             });
         }
-
-        //function fixButtonHeight() {
-        //    var maxHeight = -1;
-        //    $('.resultsButton').each(function () {
-        //        maxHeight = maxHeight > $(this).height() ? maxHeight : $(this).height();
-        //    });
-        //    $('.resultsButton').each(function () {
-        //        $(this).css("line-height", maxHeight+"px");;
-        //    });
-        //}
 
         function runSearch() {
             var path = '@Url.Action("Index","Exercises")';

@@ -1,45 +1,10 @@
-﻿#ClearSortButton {
-    margin-top: 20px;
-    display: block;
-    margin: auto;
-    border-radius: 30px;
-}
+﻿/*Top Bar*/
 
-#Groups{
-    margin: auto;
-    display: inline-block;
-}
-
-.multiChoiceButton, .AddCategory, .GroupButton {
-    width: 90px;
-    height: 90px;
-    border-radius: 4px !important;
-    margin: 1px 1px;
-    white-space: normal;
-    padding: 0px;
-}
-
-.ControlButtons button {
-    font-weight: bold;
-    width: 200px;
-    display: inline-block;
-    flex-grow: 1; /* key rule */
-    margin-right: 4px;
-}
-
-.ControlButtons {
-    display: flex;
-    margin-left: 18px;
-}
-
-.btn-group {
-    margin-bottom: 10px;
-    margin-top: 10px;
-}
-
-#ChosenCategories {
-    display: block;
-    padding: 0px;
+.top-buffer {
+    margin: 15px 0px 15px 0px;
+    padding: 20px;
+    background-color: #CDB87D;
+    margin: 20px 0px;
 }
 
 .Selection {
@@ -47,29 +12,26 @@
     justify-content: center;
     align-items: center;
     padding: 0px 15px;
-    background-color: cornflowerblue;
+    background-color: #CDB87D;
 }
 
-#ChosenCategories li {
-    padding: 15px 20px;
-    text-align: center;
-    color: white;
-    font-size: larger;
+.multiChoiceButton, .AddCategory, .GroupButton {
+    width: 90px;
+    height: 90px;
+    border-radius: 4px;
+    margin: 1px 1px;
+    white-space: normal;
+    padding: 0px;
+    background-color: #1C2957;
 }
 
-.btn-primary.active, .btn-primary.active:hover, .btn-primary:active, .btn-primary.active:focus {
-    background-color: mediumblue;
-    color: white;
-    border-color: mediumblue;
+#Groups {
+    margin: auto;
+    display: inline-block;
 }
 
-#categoriesContainer {
-    display: block;
-    margin: 0px 50px;
-    color: white;
-    background-color: cornflowerblue;
-    min-height: 583px;
-}
+
+/*Search Results*/
 
 #Results {
     display: block;
@@ -77,35 +39,16 @@
     width: 100%;
 }
 
-
-/*Table*/
-
-#ExerciseTable {
-    height:500px; 
-    overflow-y: scroll;
-    display: block;
-}
-
-#ExerciseTable a {
-    width: calc(33% - 6px);
-    margin: 8px 1px;
-    white-space: normal;
-}
-
-.top-buffer {
-    margin: 20px;
-}
-
-#ExerciseTitle {
-    display: inline-block;
+    #ExerciseTitle {
     float: left
 }
 
 #randomButton {
-    display: inline-block;
     float: right;
-    background-color: #0288d1;
+    background-color: #1C2957;
     border: #0288d1;
+    border-radius: 4px;
+    elevation: above;
 }
 
 #searchBox, searchHeader {
@@ -113,27 +56,78 @@
     width: 100%;
 }
 
-.container {
-    margin-left: 0px;
+#ExerciseTable {
+    height: 500px;
+    overflow-y: scroll;
+    display: block;
 }
 
-.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+.resultsButton {
+    width: calc(33% - 6px);
+    margin: 8px 1px;
+    white-space: normal;
+    border-radius: 4px;
+    elevation: above;
+    background-color: #1C2957;
+}
+
+/*Chosen Categories*/
+
+#categoriesContainer {
+    display: block;
+    margin: 0px 50px;
     color: white;
+    background-color: #CDB87D;
+    min-height: 583px;
 }
 
-.top-buffer {
-    margin: 15px 0px 15px 0px;
-    padding: 20px;
-    background-color: cornflowerblue;
+#ChosenCategories {
+    display: block;
+    padding: 0px;
 }
 
-.sortingTitle{
+#ChosenCategories li {
+    padding: 15px 20px;
+    text-align: center;
+    color: white;
+    font-size: larger;
+    background-color: #1C2957;
+    margin: 10px;
+    border-radius: 1px;
+}
+
+.sortingTitle {
     text-align: center;
     font-size: larger;
     color: white;
     padding: 20px 20px;
     border-bottom: 3px solid black;
-    background-color: blue;
+    background-color: #1C2957;
+}
+
+#ClearSortButton {
+    margin-top: 20px;
+    display: block;
+    margin: auto;
+    border-radius: 4px;
+    elevation: above;
+}
+
+/*Bootstrap button overwrites*/
+
+.btn-primary:hover {
+    background-color: #131c3a;
+}
+
+.btn-group {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.btn-primary.active, .btn-primary.active:hover, .btn-primary:active, .btn-primary.active:focus {
+    background-color: #131c3a;
+    color: white;
+    border-color: #131c3a;
 }
 
 /*Scrollbar*/
@@ -151,25 +145,37 @@
 ::-webkit-scrollbar-thumb {
     border-radius: 10px;
     -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
-    background-color: #4285F4;
+    background-color: #1C2957;
     min-height: 45px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background-color: blue;
-}
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #131c3a;
+    }
 
 /*Navbar*/
 
 .navbar {
-    background-color: #e8e3e3;
-    border-bottom-color: #fdd835;
+    background-color: #f1f1f1;
+    border-bottom-width: 0px;
 }
 
 .navbar-inverse .navbar-brand {
-    color: #337ab7;
+    color: #1C2957;
+}
+
+.navbar-inverse .navbar-brand:hover {
+    color: #131c3a;
 }
 
 .navbar-inverse .navbar-nav > li > a {
-    color: dimgray;
+    color: #1C2957;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover {
+    color: #131c3a;
+}
+
+.container {
+    margin-left: 0px;
 }

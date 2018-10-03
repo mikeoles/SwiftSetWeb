@@ -1,0 +1,38 @@
+﻿#video{
+    margin-top: 50px;
+}
+
+#chooseRandomButton {
+    background-color: #1C2957;
+}
+
+body {
+    background-color: #CDB87D;
+}
+
+/*Navbar*/
+
+.navbar {
+    background-color: #f1f1f1;
+    border-bottom-width: 0px;
+}
+
+.navbar-inverse .navbar-brand {
+    color: #1C2957;
+}
+
+.navbar-inverse .navbar-brand:hover {
+    color: #131c3a;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+color: #1C2957;
+}
+
+.navbar-inverse .navbar-nav > li > a:hover {
+    color: #131c3a;
+}
+
+.container {
+    margin-left: 0px;
+}
