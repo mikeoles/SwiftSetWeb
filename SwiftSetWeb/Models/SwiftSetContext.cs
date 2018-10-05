@@ -6,7 +6,7 @@ namespace SwiftSetWeb.Models
 {
     public partial class SwiftSetContext : DbContext
     {
-        public virtual DbSet<Exercises> Exercises { get; set; }
+        public virtual DbSet<Exercise> Exercises { get; set; }
         public virtual DbSet<SortingCategory> SortingCategory { get; set; }
         public virtual DbSet<SortingGroup> SortingGroups { get; set; }
 
@@ -27,7 +27,7 @@ namespace SwiftSetWeb.Models
             modelBuilder.Entity<NewOptions>().HasKey(x => new { x.SortingGroupId, x.SortingCategoryId });
             modelBuilder.Entity<NewOptions>().HasOne(x => x.SortingGroup).WithMany(x => x.NewOptions).HasForeignKey(x => x.SortingGroupId);
             modelBuilder.Entity<NewOptions>().HasOne(x => x.SortingCategory).WithMany(x => x.NewOptions).HasForeignKey(x => x.SortingCategoryId).OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Exercises>(entity =>
+            modelBuilder.Entity<Exercise>(entity =>
             {
                 entity.ToTable("exercises");
 

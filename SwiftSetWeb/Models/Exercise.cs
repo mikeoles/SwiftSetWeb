@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SwiftSetWeb.Models
 {
-    public partial class Exercises
+    public partial class Exercise
     {
         public int Id { get; set; }
         public int? Eliminated { get; set; }

@@ -7,7 +7,7 @@ namespace SwiftSetWeb.Models
 {
     public class ExerciseGroupViewModel {
         public IEnumerable<SortingGroup> SortingGroups { get; set; }
-        public IEnumerable<Exercises> Exercises { get; set; }
+        public IEnumerable<Exercise> Exercises { get; set; }
 
     }
 }

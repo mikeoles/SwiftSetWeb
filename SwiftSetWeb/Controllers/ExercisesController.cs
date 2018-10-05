@@ -14,7 +14,7 @@ namespace SwiftSetWeb.Controllers
 {
     public class ExercisesController : Controller {
         private readonly SwiftSetContext _context;
-        private static List<Exercises> currentExercises;
+        private static List<Exercise> currentExercises;
         private static readonly String fullUrl = "youtube.com/watch?v=";
         private static readonly String shortUrl = "youtu.be/";
         private static SortingCategory currentSortingCategory = new SortingCategory();
@@ -25,10 +25,10 @@ namespace SwiftSetWeb.Controllers
             _context = context;
         }
 
-        // GET: Exercises
-        public async Task<IActionResult> Index(String searchString) {
+        // GET: Exercise
+        public IActionResult Index(String searchString) {
 
-            List<Exercises> filteredExercises = GetExercises();
+            List<Exercise> filteredExercises = GetExercises();
 
             if (!String.IsNullOrEmpty(searchString))
             {
@@ -56,7 +56,7 @@ namespace SwiftSetWeb.Controllers
                 newOpts.Add(option.SortingGroupId);
             }
 
-            List<Exercises> filteredExercises = GetExercises();
+            List<Exercise> filteredExercises = GetExercises();
 
             //Narrow down the list of exercises to display based on what the user has selected
             SortingCategory sc = currentSortingCategory;
@@ -97,7 +97,7 @@ namespace SwiftSetWeb.Controllers
                 multiChoiceCategories.Add(sortingCategory);
             }
 
-            List<Exercises> filteredExercises = GetExercises();
+            List<Exercise> filteredExercises = GetExercises();
 
             if (multiChoiceCategories.Count() > 0)
             {
@@ -132,7 +132,7 @@ namespace SwiftSetWeb.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Eliminated,Name,Difficulty,Primary,Equipment,Movement,Angle,Tempo,Unilateral,Joint,Stability,Sport,Grip,Url")] Exercises exercises) {
+        public async Task<IActionResult> Create([Bind("Id,Eliminated,Name,Difficulty,Primary,Equipment,Movement,Angle,Tempo,Unilateral,Joint,Stability,Sport,Grip,Url")] Exercise exercises) {
             if (ModelState.IsValid)
             {
                 _context.Add(exercises);
@@ -162,7 +162,7 @@ namespace SwiftSetWeb.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Eliminated,Name,Difficulty,Primary,Equipment,Movement,Angle,Tempo,Unilateral,Joint,Stability,Sport,Grip,Url")] Exercises exercises) {
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Eliminated,Name,Difficulty,Primary,Equipment,Movement,Angle,Tempo,Unilateral,Joint,Stability,Sport,Grip,Url")] Exercise exercises) {
             if (id != exercises.Id)
             {
                 return NotFound();
@@ -198,7 +198,7 @@ namespace SwiftSetWeb.Controllers
                 return NotFound();
             }
 
-            Exercises exercises = await _context.Exercises
+            Exercise exercises = await _context.Exercises
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (exercises == null)
             {
@@ -216,14 +216,14 @@ namespace SwiftSetWeb.Controllers
 
         // GET: Exercises/Details/5
         public async Task<IActionResult> Random() {
-            List<Exercises> exercises = await _context.Exercises.ToListAsync();
+            List<Exercise> exercises = await _context.Exercises.ToListAsync();
             var random = new Random();
             int index = random.Next(exercises.Count);
             if (exercises == null)
             {
                 return NotFound();
             }
-            Exercises exercise = exercises[index];
+            Exercise exercise = exercises[index];
             //Get the embed code and start time for the youtube video of the selected exercise
             YoutubeData videoData = parseYoutubeUrl(exercise.Url);
             ViewBag.embedCode = videoData.videoCode;
@@ -233,8 +233,8 @@ namespace SwiftSetWeb.Controllers
             return View("~/Views/Exercises/Details.cshtml", exercise);
         }
 
-        private List<Exercises> GetExercises() {
-            List<Exercises> filteredExercises;
+        private List<Exercise> GetExercises() {
+            List<Exercise> filteredExercises;
             if (currentExercises != null)
             {
                 filteredExercises = currentExercises;
@@ -247,7 +247,7 @@ namespace SwiftSetWeb.Controllers
         }
 
         //Search for all the exercises that are push, pull, or legs movements
-        private List<Exercises> PushPullLegsSearch(string name, string columnName, List<Exercises> sortedExercises) {
+        private List<Exercise> PushPullLegsSearch(string name, string columnName, List<Exercise> sortedExercises) {
             List<string> muscles = new List<string>();
             List<string> pull = new List<string>(new string[] { "Lats", "Traps", "Biceps", "Rear Delts" });
             List<string> push = new List<string>(new string[] { "Chest", "Triceps", "Shoulders" });

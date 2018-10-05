@@ -25,13 +25,13 @@
                 <div hidden class="CategoryRows @item.Id-categories">
                     @if (@item.IsMultiChoice)
                     {
-                        <div data-toggle="buttons-checkbox">
-                            @foreach (var category in item.Categories)
-                            {
-                                <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
-                            }
-                        </div>
-                        <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this,'@item.Name')" />
+                    <div data-toggle="buttons-checkbox">
+                        @foreach (var category in item.Categories)
+                        {
+                            <button type="submit" class="btn btn-primary multiChoiceButton mcb-@item.Id" name="@item.Id" value="@category.Name" id="@category.Id">@category.Name</button>
+                        }
+                        <input class="btn btn-success hidden submitMulti submitMulti-@item.Id" type="submit" value="Submit" name="@item.Id" onclick="AddMultiCategory(this,'@item.Name',@item.Id)" />
+                    </div>
                     }
                     else
                     {
@@ -50,7 +50,12 @@
         <div class="col-sm-3">
             <div id="categoriesContainer">
                 <div class="sortingTitle">Applied Sorting</div>
-                <ol id="ChosenCategories"></ol>
+                <ol id="ChosenCategories">
+                    <li class="hidden BackToGroups">
+                        <div id="currentGroup"></div>
+                        <button class="btn btn-danger BackGroupsButton" id="">Back</button>
+                    </li>
+                </ol>
                 <button class="btn btn-danger hidden" id="ClearSortButton">Clear Sorting</button>
             </div>
         </div>
@@ -73,6 +78,8 @@
 @section Scripts {
 
     <script type="text/javascript">
+        var groupId = '';
+
         $(document).ready(function () {
 
             $('.GroupButton').each(function () {
@@ -81,27 +88,30 @@
                 }
             });
 
-            $('.multiChoiceButton').on('click', function () {
-                $(".submitMulti-" + this.name).removeClass('hidden');
-                $("#AddCategory").hide();
-            });
-
+            //When a group button is clicked, hide the other groups and show the category options for that group
             $(".GroupButton").on("click", function () {
                 $("#Groups").hide();
-                $("#Categories").show();
-                if ($("." + this.id + "-categories").is(":hidden")) {
-                    $(".CategoryRows").hide();
-                    $("." + this.id + "-categories").show();
-                } else {
-                    $(".CategoryRows").hide();
-                }
+                $(".BackToGroups").removeClass('hidden');
+                $("#currentGroup").text($(this).text());
+                groupId = this.id;
+                $("." + this.id + "-categories").show();
+            });
+
+            $('.BackGroupsButton').on('click', function () {
+                $(".BackToGroups").addClass('hidden');
+                $("#Groups").show();
+                $("." + groupId + "-categories").hide();
+            });
+
+            $('.multiChoiceButton').on('click', function () {
+                $(".submitMulti-" + this.name).removeClass('hidden');
             });
 
             $("#ClearSortButton").on("click", function () {
-                $("#ChosenCategories").empty();
-                $(".GroupButton").addClass('hidden');
-                $(".CategoryRows").hide();
+                $(".BackToGroups").addClass('hidden');
+                $('#ChosenCategories li:not(:first)').remove();
                 $('#ClearSortButton').addClass('hidden');
+                $(".GroupButton").addClass('hidden');
                 $(".GroupButton[original='yes']").removeClass('hidden');
                 var path = '@Url.Action("ClearSort","Exercises")';
                 $.ajax({
@@ -117,53 +127,39 @@
             });
         });
 
-        $(window).resize(function () {
-            $("#SearchResults").html("");
-            runSearch();
-            setTimeout(fixButtonHeight, 1000)
-        });
-
-        $(document).on('keyup', '#searchBox', function (e) {
-            var delay = (function () {
-                var timer = 0;
-                return function (callback, ms) {
-                    clearTimeout(timer);
-                    timer = setTimeout(callback, ms);
-                };
-            })();
-
-            delay(function () {runSearch()}, 1000);
-        });
-
         function AddCategory(e, id, hideButton, groupName) {
+
             $("#Groups").show();
-            $("." + hideButton + "-categories").toggle();
-            $('.' + hideButton + '-group').addClass('hidden');
-            var path = '@Url.Action("AddSort","Exercises")';
-            $("#ChosenCategories").append('<li>' + groupName + ': ' + e.id + '</li>');
             $('#ClearSortButton').removeClass('hidden');
+            $("#ChosenCategories").append('<li>' + groupName + ': ' + e.id + '</li>');
+
+            $('.' + hideButton + '-group').addClass('hidden');
+            $(".BackToGroups").addClass('hidden');
+            $("." + groupId + "-categories").hide();
+
+            var path = '@Url.Action("AddSort","Exercises")';
             $.ajax({
                 type: "GET",
                 url: path,
                 data: { categoryId: id },
             })
+            .done(function (response) {
+                $("#SearchResults").html(response);
+                var path = '@Url.Action("NewOptions","Exercises")';
+                $.ajax({
+                    type: "GET",
+                    url: path
+                })
                 .done(function (response) {
-                    $("#SearchResults").html(response);
-                    var path = '@Url.Action("NewOptions","Exercises")';
-                    $.ajax({
-                        type: "GET",
-                        url: path
-                    })
-                        .done(function (response) {
-                            for (i in response) {
-                                $("." + response[i] + "-group").removeClass('hidden');
-                            }
-                        });
+                    for (i in response) {
+                        $("." + response[i] + "-group").removeClass('hidden');
+                    }
                 });
+            });
         }
 
-        function AddMultiCategory(cat, groupName) {
-            $("#Groups").show();
+        function AddMultiCategory(cat, groupName, hideButton) {
+
             var ids = "";
             var allCategories = ""
             $(".mcb-" + cat.name).each(function (i, obj) {
@@ -179,9 +175,15 @@
                 return;
             }
 
-            $("#ChosenCategories").append('<li>' + groupName + ': ' + allCategories.slice(0, -2) + '</li>');
-            $(".CategoryRows").hide();
+            $("#Groups").show();
             $('#ClearSortButton').removeClass('hidden');
+            $("#ChosenCategories").append('<li>' + groupName + ': ' + allCategories.slice(0, -2) + '</li>');
+
+            $('.' + hideButton + '-group').addClass('hidden');
+            $(".BackToGroups").addClass('hidden');
+            $("." + groupId + "-categories").hide();
+            $(".submitMulti").addClass('hidden');
+
             var path = '@Url.Action("AddMultiSort","Exercises")';
             $.ajax({
                 type: "GET",
@@ -189,7 +191,6 @@
                 data: { categoryIds: ids },
             })
             .done(function (response) {
-                $(".submitMulti").addClass('hidden');
                 $("#SearchResults").html(response);
             });
         }
@@ -206,6 +207,18 @@
                 $("#SearchResults").html(response);
             });
         }
+
+        $(document).on('keyup', '#searchBox', function (e) {
+            var delay = (function () {
+                var timer = 0;
+                return function (callback, ms) {
+                    clearTimeout(timer);
+                    timer = setTimeout(callback, ms);
+                };
+            })();
+
+            delay(function () { runSearch() }, 1000);
+        });
 
     </script>
 }
