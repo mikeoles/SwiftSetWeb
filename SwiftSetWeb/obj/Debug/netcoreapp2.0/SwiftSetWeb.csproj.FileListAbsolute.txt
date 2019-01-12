@@ -3,9 +3,9 @@ C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\bin\Debug\netcoreapp2.0\SwiftSet
 C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\bin\Debug\netcoreapp2.0\SwiftSetWeb.runtimeconfig.dev.json
 C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\bin\Debug\netcoreapp2.0\SwiftSetWeb.dll
 C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\bin\Debug\netcoreapp2.0\SwiftSetWeb.pdb
-C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\obj\Debug\netcoreapp2.0\SwiftSetWeb.csprojAssemblyReference.cache
 C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\obj\Debug\netcoreapp2.0\SwiftSetWeb.csproj.CoreCompileInputs.cache
 C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\obj\Debug\netcoreapp2.0\SwiftSetWeb.AssemblyInfoInputs.cache
 C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\obj\Debug\netcoreapp2.0\SwiftSetWeb.AssemblyInfo.cs
 C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\obj\Debug\netcoreapp2.0\SwiftSetWeb.dll
 C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\obj\Debug\netcoreapp2.0\SwiftSetWeb.pdb
+C:\Users\moles\Projects\SwiftSetWeb\SwiftSetWeb\obj\Debug\netcoreapp2.0\SwiftSetWeb.csprojAssemblyReference.cache
