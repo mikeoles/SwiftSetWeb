@@ -68,7 +68,7 @@
 }
 
 #ExerciseTable {
-    height: 500px;
+    height: calc(100vh - 332px);
     overflow-y: auto;
     display: block;
 }
@@ -90,7 +90,7 @@
     margin: 0px 50px;
     color: white;
     background-color: #CDB87D;
-    height: 582px;
+    height: calc(100vh - 250px);
     overflow-y: auto;
 }
 
@@ -133,7 +133,7 @@
 /*Bootstrap button overwrites*/
 
 .btn-primary:hover {
-    background-color: #131c3a;
+    background-color: black;
 }
 
 .btn-group {
@@ -142,9 +142,9 @@
 }
 
 .btn-primary.active, .btn-primary.active:hover, .btn-primary:active, .btn-primary.active:focus {
-    background-color: #131c3a;
+    background-color: black;
     color: white;
-    border-color: #131c3a;
+    border-color: black;
 }
 
 /*Scrollbar*/
@@ -167,7 +167,7 @@
 }
 
     ::-webkit-scrollbar-thumb:hover {
-        background-color: #131c3a;
+        background-color: black;
     }
 
 /*Navbar*/
